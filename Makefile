@@ -1,27 +1,15 @@
-# Detect OS
-ifeq ($(OS),Windows_NT)
-    EXE := .exe
-    RM := rmdir /S /Q
-    MKDIR := mkdir
-    RUN := bin\client$(EXE)
-    SEP := \\
-else
-    EXE :=
-    RM := rm -rf
-    MKDIR := mkdir -p
-    RUN := ./bin/client$(EXE)
-    SEP := /
-endif
-
-SRC := src$(SEP)client$(SEP)*.c
-OUT := bin$(SEP)client$(EXE)
-
 client: clean
-	gcc $(SRC) -o $(OUT)
+	gcc src/client/*.c -lSDL3 -o bin/client
+
+windows: clean
+	x86_64-w64-mingw32-gcc src/client/*.c -lSDL3 -o bin/client.exe
+
+all: client windows
 
 test: client
-	$(RUN)
+	./bin/client
+
 
 clean:
-	-$(RM) bin 2>nul || true
-	$(MKDIR) bin
+	rm -rf bin/
+	mkdir -p bin/
