@@ -1,48 +1,50 @@
 
 
 // data structures for game objects and packets
-struct rect {
+pub struct Rect {
     x: f32,
     y: f32,
     width: f32,
     height: f32,
 }
-struct circle {
+struct Circle {
     x: f32,
     y: f32,
     radius: f32,
 }
-struct image {
+struct Image {
     x: f32,
     y: f32,
     width: f32,
     height: f32,
     src: String,
 }
-struct polygon {
+struct Polygon {
     points: Vec<(f32, f32)>,
 }
 
 
 // impl methods for game objects
 
-impl rect {
-    fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
-        rect { x, y, width, height }
+impl Rect {
+    pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self{
+        Self { x, y, width, height }
     }
-    fn move_by(&mut self, dx: f32, dy: f32) {
+    pub fn move_by(&mut self, dx: f32, dy: f32) {
         self.x += dx;
         self.y += dy;
     }
-    fn pos(&self) -> (f32, f32) {
+    pub fn pos(&self) -> (f32, f32) {
         (self.x, self.y)
     }
-    fn size(&self) -> (f32, f32) {
+    pub fn size(&self) -> (f32, f32) {
         (self.width, self.height)
     }
 }
 
 
-impl circle {}
-    fn new{x: f32, y}
+impl Circle {
+    fn new(x: f32, y: f32, radius: f32) -> Self {
+        Circle { x, y, radius }
+    }
 }
