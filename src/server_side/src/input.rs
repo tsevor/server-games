@@ -1,0 +1,36 @@
+//we are going to use arc of a map to handle inputs 
+
+#[derive(default)]
+struct keys{
+    key_a: bool,
+    key_b: bool,
+    key_c: bool,
+    key_d: bool,
+    key_e: bool,
+    key_f: bool,
+    key_g: bool,
+    key_h: bool,
+    key_i: bool,
+    key_j: bool,
+    key_k: bool,
+    key_l: bool,
+    key_m: bool,
+    key_n: bool,
+    key_o: bool,
+    key_p: bool,
+    key_q: bool,
+    key_r: bool,
+    key_s: bool,
+    key_t: bool,
+    key_u: bool,
+    key_v: bool,
+    key_w: bool,
+    key_x: bool,
+    key_y: bool,
+    key_z: bool,
+    key_space: bool,
+    key_enter: bool,
+    key_shift: bool,
+    key_ctrl: bool,
+
+}

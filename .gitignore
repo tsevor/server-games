@@ -1,1 +1,3 @@
 bin/
+target/
+src/server_side/target/
