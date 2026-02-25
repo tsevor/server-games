@@ -5,7 +5,7 @@ use std::str;
 
 
 
-fn handle_client(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
+fn accept_client(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
     let mut buffer = [0; 1024];
     let bytes_read = stream.read(&mut buffer)?;
     stream.set_nonblocking(true)?;
@@ -33,8 +33,7 @@ fn handle_client(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>
         
 
         println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read])
-        //hiiiiiiiiiii
-        //hello
+        
     }
 }
 
@@ -44,7 +43,7 @@ pub fn start_listening() -> std::io::Result<()> {
 
     // accept connections and process them serially
     for mut stream in listener.incoming() {
-        let _ = handle_client(stream?);
+        let _ = accept_client(stream?);
     }
-    Ok(())
+    return stream;
 }
