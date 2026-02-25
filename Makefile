@@ -6,6 +6,10 @@ windows: clean
 
 all: client windows
 
+debug:
+	gcc -g src/client/*.c -lSDL3 -o bin/client
+	gdb ./bin/client
+
 test: client
 	./bin/client
 

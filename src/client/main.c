@@ -1,56 +1,44 @@
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
+#include <SDL2/SDL.h>
+
+#include "drawing.h"
 
 int main(int argc, char* argv[]) {
-    SDL_Window* window = NULL;
-    SDL_Renderer* renderer = NULL; // Must declare the renderer
+	SDL_Window* window = NULL;
+	SDL_Renderer* renderer = NULL;
 
-    // Initialize SDL
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
-        return -1;
-    }
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
+		return -1;
+	}
 
-    // Create a window
-    window = SDL_CreateWindow("Hello SDL3", 800, 600, SDL_WINDOW_RESIZABLE);
-    if (!window) {
-        SDL_Log("Failed to create window: %s", SDL_GetError());
-        SDL_Quit();
-        return -1;
-    }
+	SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
 
-    // Create a renderer (Required to use SDL_Render functions)
-    renderer = SDL_CreateRenderer(window, NULL);
-    if (!renderer) {
-        SDL_Log("Failed to create renderer: %s", SDL_GetError());
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return -1;
-    }
+	SDL_SetWindowTitle(window, "Server Game Client");
 
-    // Main application loop
-    SDL_Event event;
-    bool app_quit = false; // SDL3 uses standard C bool by default
-    
-    while (!app_quit) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {
-                app_quit = true;
-            }
-        }
+	int app_quit = 0;
+	
+	SDL_Event event;
+	while (!app_quit) {
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT) {
+				app_quit = 1;
+			}
+		}
 
-        // Clear screen to blue
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-        SDL_RenderClear(renderer);
-        
-        // Present the backbuffer
-        SDL_RenderPresent(renderer);
-    }
+		SDL_Color c = {0, 0, 0, 0};
+		fillScreen(renderer, c);
+		SDL_Rect r = {10, 10, 20, 20};
+		*(uint32_t*)&c = 0xffffffff;
+		fillRect(renderer, r, c);
 
-    // Clean up in reverse order of creation
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+		refresh(renderer);
+	}
 
-    return 0;
+	// Clean up in reverse order of creation
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+
+	return 0;
 }
