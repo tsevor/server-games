@@ -2,49 +2,67 @@
 
 // data structures for game objects and packets
 pub struct Rect {
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
+    x:i32,
+    y:i32,
+    width:i32,
+    height:i32,
 }
 struct Circle {
-    x: f32,
-    y: f32,
-    radius: f32,
+    x:i32,
+    y:i32,
+    radius:i32,
 }
 struct Image {
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
+    x:i32,
+    y:i32,
+    width:i32,
+    height:i32,
     src: String,
 }
 struct Polygon {
-    points: Vec<(f32, f32)>,
+    points: Vec<i32,i32)>,
 }
 
 
 // impl methods for game objects
 
 impl Rect {
-    pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self{
+    pub fn new(x:i32, y:i32, width:i32, height:i32) -> Self{
         Self { x, y, width, height }
     }
-    pub fn move_by(&mut self, dx: f32, dy: f32) {
+    pub fn move_by(&mut self, dx:i32, dy:i32) {
         self.x += dx;
         self.y += dy;
     }
-    pub fn pos(&self) -> (f32, f32) {
+    pub fn set_pos(&self , x:i32, y:i32){
+        self.x = x;
+        self.y = y;
+    }
+    pub fn pos(&self) -> i32,i32) {
         (self.x, self.y)
     }
-    pub fn size(&self) -> (f32, f32) {
+    pub fn size(&self) -> i32,i32) {
         (self.width, self.height)
     }
 }
 
 
 impl Circle {
-    fn new(x: f32, y: f32, radius: f32) -> Self {
+    fn new(x:i32, y:i32, radius:i32) -> Self {
         Circle { x, y, radius }
     }
-}
+    pub fn move_by(&mut self, dx:i32, dy:i32) {
+        self.x += dx;
+        self.y += dy;
+    }
+    pub fn set_pos(&self , x:i32, y:i32){
+        self.x = x;
+        self.y = y;
+    }
+    pub fn pos(&self) -> i32,i32) {
+        (self.x, self.y)
+    }
+    pub fn size(&self) -> i32,i32) {
+        (self.width, self.height)
+    }
+} 
