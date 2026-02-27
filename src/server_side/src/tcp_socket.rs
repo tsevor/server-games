@@ -45,5 +45,6 @@ pub fn start_listening() -> std::io::Result<()> {
     for mut stream in listener.incoming() {
         let _ = accept_client(stream?);
     }
-    return stream;
+    //return stream;
+    Ok(())
 }

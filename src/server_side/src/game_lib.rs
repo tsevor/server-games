@@ -20,11 +20,7 @@ struct Image {
     src: String,
 }
 struct Polygon {
-<<<<<<< HEAD
-    points: Vec<(i32,i32)>,
-=======
-    points: Vec<u16,u16>,
->>>>>>> 22a610f (Normalize line endings to LF)
+    points: Vec<(u16,u16)>,
 }
 
 
@@ -38,25 +34,14 @@ impl Rect {
         self.x += dx;
         self.y += dy;
     }
-<<<<<<< HEAD
-    pub fn set_pos(&mut self , x:i32, y:i32){
-        self.x = x;
-        self.y = y;
-    }
-    pub fn pos(&self) -> (i32,i32) {
-        (self.x, self.y)
-    }
-    pub fn size(&self) -> (i32,i32) {
-=======
     pub fn set_pos(&mut self , x:u16, y:u16){
         self.x = x;
         self.y = y;
     }
-    pub fn pos(&self) -> u16,u16 {
+    pub fn pos(&self) -> (u16,u16) {
         (self.x, self.y)
     }
-    pub fn size(&self) -> u16,u16 {
->>>>>>> 22a610f (Normalize line endings to LF)
+    pub fn size(&self) -> (u16,u16) {
         (self.width, self.height)
     }
 }
@@ -70,26 +55,14 @@ impl Circle {
         self.x += dx;
         self.y += dy;
     }
-<<<<<<< HEAD
-    pub fn set_pos(&mut self , x:i32, y:i32){
-        self.x = x;
-        self.y = y;
-    }
-    pub fn pos(&self) -> (i32,i32) {
-        (self.x, self.y)
-    }
-    pub fn size(&self) -> (i32,i32) {
-        (self.radius * 2, self.radius * 2)
-=======
     pub fn set_pos(&mut self , x:u16, y:u16){
         self.x = x;
         self.y = y;
     }
-    pub fn pos(&self) -> u16,u16 {
+    pub fn pos(&self) -> (u16,u16) {
         (self.x, self.y)
     }
-    pub fn size(&self) -> u16,u16 {
-        (self.width, self.height)
->>>>>>> 22a610f (Normalize line endings to LF)
+    pub fn size(&self) -> (u16) {
+        (self.radius)
     }
 } 
