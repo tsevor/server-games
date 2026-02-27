@@ -1,40 +1,25 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{Read,Write};
-use std::error::Error;
 use std::str;
+use crate::games::game;
+use std::thread;
 
+const HANDSHAKE_LEN: usize = 3;
 
+fn accept_client(mut stream: TcpStream) -> std::io::Result<()> {
+    let mut handshake = [0; HANDSHAKE_LEN];
+    let _ = stream.read_exact(&mut handshake)?;
+    //stream.set_nonblocking(true)?;
 
-fn accept_client(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
-    let mut buffer = [0; 1024];
-    let bytes_read = stream.read(&mut buffer)?;
-    stream.set_nonblocking(true)?;
-
-    if str::from_utf8(&buffer[..bytes_read]) == Ok("sup") { 
-        let _ = stream.write(b"hey bud"); 
+    if str::from_utf8(&handshake[..HANDSHAKE_LEN]) == Ok("sup") { 
+        let _ = stream.write(b"hey bud\n"); 
     } else {
         println!("Connection closed");
         return Ok(());
     }
 
-    loop {
-        let bytes_read = stream.read(&mut buffer)?;
-        
-        if bytes_read == 0 {
-            // Connection closed by the peer
-            println!("Connection closed");
-            break Ok(());
-        }
-        
-        if buffer[0] == 4 {
-            if bytes_read < 8 || (bytes_read - 4)%4 != 0 { let _ = stream.write(b"hey bud");  }
-        }
-
-        
-
-        println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read])
-        
-    }
+    game(stream);
+    return Ok(());
 }
 
 pub fn start_listening() -> std::io::Result<()> {
@@ -42,9 +27,15 @@ pub fn start_listening() -> std::io::Result<()> {
     //listener.set_nonblocking(true)?;
 
     // accept connections and process them serially
-    for mut stream in listener.incoming() {
+    for stream in listener.incoming() {
         let _ = accept_client(stream?);
     }
     //return stream;
     Ok(())
 }
+
+
+/*
+Packet structure:
+
+*/

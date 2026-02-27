@@ -62,7 +62,7 @@ impl Circle {
     pub fn pos(&self) -> (u16,u16) {
         (self.x, self.y)
     }
-    pub fn size(&self) -> (u16) {
-        (self.radius)
+    pub fn size(&self) -> u16 {
+        self.radius
     }
 } 
