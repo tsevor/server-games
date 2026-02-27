@@ -20,7 +20,7 @@ struct Image {
     src: String,
 }
 struct Polygon {
-    points: Vec<i32,i32)>,
+    points: Vec<(i32,i32)>,
 }
 
 
@@ -34,14 +34,14 @@ impl Rect {
         self.x += dx;
         self.y += dy;
     }
-    pub fn set_pos(&self , x:i32, y:i32){
+    pub fn set_pos(&mut self , x:i32, y:i32){
         self.x = x;
         self.y = y;
     }
-    pub fn pos(&self) -> i32,i32) {
+    pub fn pos(&self) -> (i32,i32) {
         (self.x, self.y)
     }
-    pub fn size(&self) -> i32,i32) {
+    pub fn size(&self) -> (i32,i32) {
         (self.width, self.height)
     }
 }
@@ -55,14 +55,14 @@ impl Circle {
         self.x += dx;
         self.y += dy;
     }
-    pub fn set_pos(&self , x:i32, y:i32){
+    pub fn set_pos(&mut self , x:i32, y:i32){
         self.x = x;
         self.y = y;
     }
-    pub fn pos(&self) -> i32,i32) {
+    pub fn pos(&self) -> (i32,i32) {
         (self.x, self.y)
     }
-    pub fn size(&self) -> i32,i32) {
-        (self.width, self.height)
+    pub fn size(&self) -> (i32,i32) {
+        (self.radius * 2, self.radius * 2)
     }
 } 
