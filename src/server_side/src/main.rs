@@ -8,6 +8,7 @@ use tcp_socket::start_listening;
 use std::sync::{Arc, Mutex};
 use game_lib::Rect;
 
+<<<<<<< HEAD
 //input arc method (arc is a wayt to share data between threads mutex makes it mutable) 
 
 //to use it in other areas inport it and use method arc::clone(&input) to clone it and use it in other areas
@@ -15,6 +16,16 @@ use game_lib::Rect;
 
 fn main() {
     let input = Arc::new(Mutex::new(keys::default()));
+=======
+
+
+fn main() {
+    //input arc method (arc is a wayt to share data between threads mutex makes it mutable) 
+    let input = Arc::new(Mutex::new(keys::default()));
+    //to use it in other areas inport it and use method arc::clone(&input) to clone it and use it in other areas
+    //and assign that to a variable
+
+>>>>>>> 22a610f (Normalize line endings to LF)
     let test = Rect::new(10.0, 20.0, 100.0, 200.0);
     let (x, y) = test.pos();
     let (width, height) = test.size();

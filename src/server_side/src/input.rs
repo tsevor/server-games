@@ -1,7 +1,7 @@
 //we are going to use arc of a map to handle inputs 
 
 #[derive(Default, Clone)]
-struct keys{
+struct Keys{
     key_a: bool,
     key_b: bool,
     key_c: bool,
