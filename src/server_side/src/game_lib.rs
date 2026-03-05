@@ -14,7 +14,8 @@ pub struct Circle {
     pub id: u16,
     pub x:u16,
     pub y:u16,
-    pub radius:u16,
+    pub width:u16,
+    pub height:u16,
 }
 pub struct Image {
     pub id: u16,
@@ -68,9 +69,9 @@ impl Rect {
 
 
 impl Circle {
-    pub fn new(x:u16, y:u16, radius:u16) -> Self {
+    pub fn new(x:u16, y:u16, width:u16, height:u16) -> Self {
         ID_COUNTER.fetch_add(1, Ordering::SeqCst);
-        Circle { id: ID_COUNTER.load(Ordering::SeqCst), x, y, radius }
+        Circle { id: ID_COUNTER.load(Ordering::SeqCst), x, y, width, height }
     }
     pub fn move_by(&mut self, dx:u16, dy:u16) {
         self.x += dx;
@@ -83,8 +84,8 @@ impl Circle {
     pub fn pos(&self) -> (u16,u16) {
         (self.x, self.y)
     }
-    pub fn size(&self) -> u16 {
-        self.radius
+    pub fn size(&self) -> (u16,u16) {
+        (self.width, self.height)
     }
 } 
 
@@ -157,5 +158,8 @@ impl GameObjects {
     }   
     pub fn rects(&self) -> &[Rect] {
         &self.rects
+    }
+    pub fn circles(&self) -> &[Circle] {
+        &self.circles
     }
 }

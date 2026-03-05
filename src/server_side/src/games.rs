@@ -17,19 +17,37 @@ fn send_game_state(stream: &mut TcpStream, objects: &GameObjects) -> Result<(), 
     // Serialize game state and send to client
     let mut data: Vec<u16> = Vec::new();
 
-    data.push(4); // Sends rects
-    data.push(objects.rects().len() as u16);
-    data.push(1); // Set to red to 0
-    data.push(1); // Set to green to 0
-    data.push(255); // Set blue to 255
+    if objects.rects().len() > 0{
+        data.push(4); // Sends rects
+        data.push(objects.rects().len() as u16);
+        data.push(1); // Set to red to 0
+        data.push(1); // Set to green to 0
+        data.push(255); // Set blue to 255
 
-    for rect in objects.rects() {
-        data.push(rect.x);
-        data.push(rect.y);
-        data.push(rect.width);
-        data.push(rect.height);
+        for rect in objects.rects() {
+            data.push(rect.x);
+            data.push(rect.y);
+            data.push(rect.width);
+            data.push(rect.height);
+        }
     }
-    
+
+    if objects.circles().len() > 0{
+
+        data.push(4); // Sends circles
+        data.push(objects.circles().len() as u16);
+        data.push(1); // Set to red to 0
+        data.push(1); // Set to green to 0
+        data.push(255); // Set blue to 255
+
+        for circle in objects.circles() {
+            data.push(circle.x);
+            data.push(circle.y);
+            data.push(circle.width);
+            data.push(circle.height);
+        }
+    }   
+
     println!("Sending: {:?}",data);
     let mut bytes = Vec::with_capacity(data.len() * 2);
     for n in data {
