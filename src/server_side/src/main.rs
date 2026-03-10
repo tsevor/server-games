@@ -37,7 +37,6 @@ fn main() {
     }
     print!("\x1b[0m]")
     let _ = start_listening();
-    game(stream)
     //connection stuff getting mew clien=mts ect
     //assigm mew thread to cliemt with the ip an
 }

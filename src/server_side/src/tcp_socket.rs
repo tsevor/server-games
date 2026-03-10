@@ -4,6 +4,7 @@ use std::str;
 use crate::games::game;
 use std::thread;
 use crate::game_lib::GameObjects;
+use byteorder::{BigEndian, WriteBytesExt};
 
 const HANDSHAKE_LEN: usize = 3;
 
@@ -19,7 +20,8 @@ fn accept_client(mut stream: TcpStream) -> std::io::Result<()> {
         return Ok(());
     }
 
-    return stream;
+    game(stream);
+    return Ok(());
 }
 
 pub fn start_listening() -> std::io::Result<()> {
@@ -34,7 +36,7 @@ pub fn start_listening() -> std::io::Result<()> {
     Ok(())
 }
 
-fn send_game_state(stream: &mut TcpStream, objects: &GameObjects) -> Result<(), Box<dyn std::error::Error>> {
+pub fn send_game_state(stream: &mut TcpStream, objects: &GameObjects) -> Result<(), Box<dyn std::error::Error>> {
     // Serialize game state and send to client
     let mut data: Vec<u16> = Vec::new();
 
