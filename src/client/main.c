@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
 		// read one byte for packet type
 		uint8_t packet_type;
 		int r = SDLNet_TCP_Recv(socket, &packet_type, 1);
-		
+
 		if (r <= 0) {
 			SDL_Log("Failed to receive packet type: %s", SDLNet_GetError());
 			cleanup();
@@ -140,6 +140,46 @@ int main(int argc, char* argv[]) {
 			if (r == 3) {
 				SDL_Color color = {color_buf[0], color_buf[1], color_buf[2], 255};
 				fillScreen(renderer, color);
+			}
+			break;
+		}
+		case 0x03: { // draw points: NRGB(XXYY)
+			uint8_t header[1];
+			r = SDLNet_TCP_Recv(socket, header, 1);
+			if (r != 1) break;
+			uint8_t n = header[0];
+			for (int i = 0; i < n; i++) {
+				uint8_t point_buf[7];
+				r = SDLNet_TCP_Recv(socket, point_buf, 7);
+				if (r != 7) break;
+				SDL_Color color = {point_buf[0], point_buf[1], point_buf[2], 255};
+				int x = point_buf[3] | (point_buf[4] << 8);
+				int y = point_buf[5] | (point_buf[6] << 8);
+				drawPoint(renderer, x, y, color);
+			}
+			break;
+		}
+		case 0x04: // fill rects: NRGB(XXYYWWHH)
+		case 0x05: { // draw rects: NRGB(XXYYWWHH)
+			uint8_t header[1];
+			r = SDLNet_TCP_Recv(socket, header, 1);
+			if (r != 1) break;
+			uint8_t n = header[0];
+			for (int i = 0; i < n; i++) {
+				uint8_t rect_buf[11];
+				r = SDLNet_TCP_Recv(socket, rect_buf, 11);
+				if (r != 11) break;
+				SDL_Color color = {rect_buf[0], rect_buf[1], rect_buf[2], 255};
+				int x = rect_buf[3] | (rect_buf[4] << 8);
+				int y = rect_buf[5] | (rect_buf[6] << 8);
+				int w = rect_buf[7] | (rect_buf[8] << 8);
+				int h = rect_buf[9] | (rect_buf[10] << 8);
+				SDL_Rect rect = {x, y, w, h};
+				if (packet_type == 0x04) {
+					fillRect(renderer, rect, color);
+				} else {
+					drawRect(renderer, rect, color);
+				}
 			}
 			break;
 		}
