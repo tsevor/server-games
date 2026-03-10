@@ -2,6 +2,12 @@
 
 ## protocol
 
+initial handshake
+
+client sends: `hey`
+
+server responds: `sup`
+
 | ID | NAME          | BYTES
 | -- | ------------- | -----
 | 00 | refresh       | -

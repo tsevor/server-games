@@ -13,8 +13,8 @@ fn accept_client(mut stream: TcpStream) -> std::io::Result<()> {
     let _ = stream.read_exact(&mut handshake)?;
     //stream.set_nonblocking(true)?;
 
-    if str::from_utf8(&handshake[..HANDSHAKE_LEN]) == Ok("sup") { 
-        let _ = stream.write(b"hey bud\n"); 
+    if str::from_utf8(&handshake[..HANDSHAKE_LEN]) == Ok("hey") { 
+        let _ = stream.write(b"sup"); 
     } else {
         println!("Connection closed");
         return Ok(());

@@ -71,13 +71,13 @@ int main(int argc, char* argv[]) {
 
 	SDL_Log("Successfully connected to %s:%d", server_ip, server_port);
 
-	SDLNet_TCP_Send(socket, "sup", 3);
+	SDLNet_TCP_Send(socket, "hey", 3);
 	uint8_t buf[1024];
 	int r = SDLNet_TCP_Recv(socket, buf, 7);
 
 	if (r > 0) {
 		// ensure the server replied "hey bud"
-		if (r == 7 && strncmp(buf, "hey bud", 7) == 0) {
+		if (r == 3 && strncmp(buf, "sup", 3) == 0) {
 			SDL_Log("Handshake successful!");
 		} else {
 			SDL_Log("Unexpected server reply: %.*s", r, buf);
