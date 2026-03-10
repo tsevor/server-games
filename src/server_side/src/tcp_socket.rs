@@ -43,9 +43,10 @@ pub fn send_game_state(stream: &mut TcpStream, objects: &GameObjects) -> Result<
     if objects.rects().len() > 0{
         data.push(4); // Sends rects
         data.push(objects.rects().len() as u8);
-        data.push(1); // Set to red to 0
-        data.push(1); // Set to green to 0
-        data.push(255); // Set blue to 255
+		// set color to blue
+        data.push(0);
+        data.push(0);
+        data.push(255);
 
         for rect in objects.rects() {
             data.push((rect.x & 0xff) as u8);
@@ -61,11 +62,12 @@ pub fn send_game_state(stream: &mut TcpStream, objects: &GameObjects) -> Result<
 
     if objects.circles().len() > 0{
 
-        data.push(4); // Sends circles
+        data.push(6); // Sends circles
         data.push(objects.circles().len() as u8);
-        data.push(1); // Set to red to 0
-        data.push(1); // Set to green to 0
-        data.push(255); // Set blue to 255
+		// set color to green
+        data.push(0);
+        data.push(255);
+        data.push(0);
 
         for circle in objects.circles() {
             data.push((circle.x & 0xff) as u8);

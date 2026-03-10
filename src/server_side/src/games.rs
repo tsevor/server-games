@@ -23,6 +23,8 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
     let mut objects = GameObjects::new();
     let mut test = Rect::new(10, 20, 100, 200);
     objects.add_object(ObjectTypes::Rect(test));
+    let mut test2 = Circle::new(100, 50, 20, 40);
+    objects.add_object(ObjectTypes::Circle(test2));
     send_game_state(&mut stream, &objects);
 
     loop {
