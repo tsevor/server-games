@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) {
 	SDL_Log("Successfully connected to %s:%d", server_ip, server_port);
 
 	SDLNet_TCP_Send(socket, "hey", 3);
-	uint8_t buf[1024];
-	int r = SDLNet_TCP_Recv(socket, buf, 7);
+	uint8_t buf[4];
+	int r = SDLNet_TCP_Recv(socket, buf, 3);
 
 	if (r > 0) {
 		// ensure the server replied "hey bud"
