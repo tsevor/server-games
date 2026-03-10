@@ -22,7 +22,7 @@ fn main() {
     print!("\x1b[2J");
     print!("\x1b[48;5;67m");
     print!("\x1b[H");
-    for n in 1..50{
+    for n in 1..100{
         
         print!("\x1b[48;5;238m");
         print!("\x1b[K");
