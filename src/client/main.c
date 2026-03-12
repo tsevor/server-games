@@ -7,8 +7,8 @@
 
 #include "drawing.h"
 
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
 
 IPaddress ip;
 uint16_t server_port;
@@ -44,13 +44,13 @@ void send_keyboard() {
 }
 
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 	if (argc != 3) {
 		SDL_Log("Usage: %s <IP_ADDRESS> <PORT>\n", argv[0]);
 		return -1;
 	}
 
-	char* server_ip = argv[1];
+	char *server_ip = argv[1];
 	server_port = atoi(argv[2]);
 	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -85,13 +85,13 @@ int main(int argc, char* argv[]) {
 
 	SDL_Log("Successfully connected to %s:%d", server_ip, server_port);
 
-	SDLNet_TCP_Send(socket, "sup", 3);
-	uint8_t buf[1024];
-	int r = SDLNet_TCP_Recv(socket, buf, 7);
+	SDLNet_TCP_Send(socket, "hey", 3);
+	uint8_t buf[4];
+	int r = SDLNet_TCP_Recv(socket, buf, 3);
 
 	if (r > 0) {
 		// ensure the server replied "hey bud"
-		if (r == 7 && strncmp(buf, "hey bud", 7) == 0) {
+		if (r == 3 && strncmp(buf, "sup", 3) == 0) {
 			SDL_Log("Handshake successful!");
 		} else {
 			SDL_Log("Unexpected server reply: %.*s", r, buf);
@@ -157,6 +157,9 @@ int main(int argc, char* argv[]) {
 			}
 			break;
 		}
+		case 0x02: // draw image (gzip): SSXXYYWWHH{DATA}
+			// unimplemented for now because it's a bad idea and too hard
+			break;
 		case 0x03: { // draw points: NRGB(XXYY)
 			uint8_t header[1];
 			r = SDLNet_TCP_Recv(socket, header, 1);
@@ -174,7 +177,9 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 		case 0x04: // fill rects: NRGB(XXYYWWHH)
-		case 0x05: { // draw rects: NRGB(XXYYWWHH)
+		case 0x05: // draw rects: NRGB(XXYYWWHH)
+		case 0x06: // fill ellipses: NRGB(XXYYWWHH)
+		case 0x07: { // draw ellipses: NRGB(XXYYWWHH)
 			uint8_t header[1];
 			r = SDLNet_TCP_Recv(socket, header, 1);
 			if (r != 1) break;
@@ -191,8 +196,12 @@ int main(int argc, char* argv[]) {
 				SDL_Rect rect = {x, y, w, h};
 				if (packet_type == 0x04) {
 					fillRect(renderer, rect, color);
-				} else {
+				} else if (packet_type == 0x05) {
 					drawRect(renderer, rect, color);
+				} else if (packet_type == 0x06) {
+					fillEllipse(renderer, rect, color);
+				} else if (packet_type == 0x07) {
+					drawEllipse(renderer, rect, color);
 				}
 			}
 			break;

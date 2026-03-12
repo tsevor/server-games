@@ -1,2 +1,3 @@
 [workspace]
 members = ["src/server_side"]
+resolver = "3"

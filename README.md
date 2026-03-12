@@ -2,6 +2,8 @@
 
 ## protocol
 
+initial handshake
+
 client says `hey`
 
 server responds with `sup`
