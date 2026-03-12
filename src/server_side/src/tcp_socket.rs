@@ -33,7 +33,10 @@ pub fn start_listening(host: &str, port: &str) -> std::io::Result<()> {
 
     // accept connections and process them serially
     for stream in listener.incoming() {
-        let _ = accept_client(stream?);
+        thread::spawn(move || {
+            let _ = accept_client(stream?);
+        }
+    );
     }
     //return stream;
     Ok(())

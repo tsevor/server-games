@@ -1,4 +1,5 @@
 use std::sync::atomic::{AtomicU16, Ordering};
+use std::collections::HashMap;
 
 static ID_COUNTER: AtomicU16 = AtomicU16::new(0);
 
@@ -31,10 +32,10 @@ pub struct Polygon {
 }
 
 pub struct GameObjects {
-    rects: Vec<Rect>,
-    circles: Vec<Circle>,
-    images: Vec<Image>,
-    polygons: Vec<Polygon>,
+    rects: HashMap<String, Rect>,
+    circles: HashMap<String, Circle>,
+    images: HashMap<String, Image>,
+    polygons: HashMap<String, Polygon>,
 }
 
 pub enum ObjectTypes {
@@ -142,24 +143,30 @@ impl Polygon {
 impl GameObjects {
     pub fn new() -> Self {
         GameObjects {
-            rects: Vec::new(),
-            circles: Vec::new(),
-            images: Vec::new(),
-            polygons: Vec::new(),
+            rects: HashMap::new(),
+            circles: HashMap::new(),
+            images: HashMap::new(),
+            polygons: HashMap::new(),
         }
     }
-    pub fn add_object(&mut self, obj: ObjectTypes) {
+    pub fn add_object(&mut self, key: &str, obj: ObjectTypes) {
         match obj {
-            ObjectTypes::Rect(rect) => self.rects.push(rect),
-            ObjectTypes::Circle(circle) => self.circles.push(circle),
-            ObjectTypes::Image(image) => self.images.push(image),
-            ObjectTypes::Polygon(polygon) => self.polygons.push(polygon),
+            ObjectTypes::Rect(rect) => { self.rects.insert(key.to_string(), rect); }
+            ObjectTypes::Circle(circle) => { self.circles.insert(key.to_string(), circle); }
+            ObjectTypes::Image(image) => { self.images.insert(key.to_string(), image); }
+            ObjectTypes::Polygon(polygon) => { self.polygons.insert(key.to_string(), polygon); }
         }
-    }   
+    }
+
+    pub fn get_rect(&self, key: &str) -> Rect{
+        self.rects.get(key)
+    }
     pub fn rects(&self) -> &[Rect] {
-        &self.rects
+        let values: Vec<Rect> = self.rects.values().cloned().collect();
+        return values 
     }
     pub fn circles(&self) -> &[Circle] {
-        &self.circles
+        let values: Vec<Circle> = self.circles.values().cloned().collect();
+        return values 
     }
 }

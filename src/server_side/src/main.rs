@@ -8,6 +8,7 @@ use std::env;
 use std::process;
 use crossterm::event::{self, Event, KeyCode};
 use crossterm::terminal::{enable_raw_mode, disable_raw_mode};
+use std::thread;
 
 use std::io::Write;
 
@@ -26,6 +27,9 @@ fn main() {
     enable_raw_mode().unwrap();
     let mut quit = false;
     terminal_ui();
+    thread::spawn(move || {
+        let _ = start_listening(&args[1],&args[2]);
+    });
     while  !quit {
         
         print!("\x1b[48;5;67m");
@@ -45,7 +49,6 @@ fn main() {
         }
     }
     std::io::stdout().flush().unwrap();
-    let _ = start_listening(&args[1],&args[2]);
     print!("\x1b[2J");
     print!("\x1b[?25h");
     print!("\x1b[0m");
