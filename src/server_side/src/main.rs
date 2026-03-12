@@ -18,6 +18,43 @@ fn main() {
     //input arc method (arc is a wayt to share data between threads mutex makes it mutable)
     enable_raw_mode().unwrap();
     let mut quit = false;
+    terminal_ui();
+    while  !quit {
+        
+        print!("\x1b[48;5;67m");
+        std::io::stdout().flush().unwrap();
+
+        //keyboard input
+        if event::poll(std::time::Duration::from_millis(10)).unwrap() {
+            if let Event::Key(key) = event::read().unwrap() {
+                match key.code {
+                    KeyCode::Char('q') => {
+                        quit = true;
+                        break;
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+    std::io::stdout().flush().unwrap();
+    let _ = start_listening();
+    print!("\x1b[2J");
+    print!("\x1b[?25h");
+    print!("\x1b[0m");
+    print!("\x1b[1000E");
+    
+    
+    disable_raw_mode().unwrap();
+    //connection stuff getting mew clien=mts ect
+    //assigm mew thread to cliemt with the ip an
+}
+
+//server thread code
+//fn thread 
+
+fn terminal_ui(){
+    enable_raw_mode().unwrap();
     print!("\x1b[?25l");
     print!("\x1b[2J");
     print!("\x1b[48;5;67m");
@@ -58,36 +95,4 @@ fn main() {
     print!("\x1b[48;5;62m");
     
     std::io::stdout().flush().unwrap();
-    while  !quit {
-        
-        print!("\x1b[48;5;67m");
-        std::io::stdout().flush().unwrap();
-
-        //keyboard input
-        if event::poll(std::time::Duration::from_millis(10)).unwrap() {
-            if let Event::Key(key) = event::read().unwrap() {
-                match key.code {
-                    KeyCode::Char('q') => {
-                        quit = true;
-                        break;
-                    }
-                    _ => {}
-                }
-            }
-        }
-    }
-    std::io::stdout().flush().unwrap();
-    let _ = start_listening();
-    print!("\x1b[2J");
-    print!("\x1b[?25h");
-    print!("\x1b[0m");
-    print!("\x1b[1000E");
-    
-    
-    disable_raw_mode().unwrap();
-    //connection stuff getting mew clien=mts ect
-    //assigm mew thread to cliemt with the ip an
 }
-
-//server thread code
-//fn thread 
