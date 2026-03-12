@@ -5,6 +5,7 @@ use crate::games::game;
 use std::thread;
 use crate::game_lib::GameObjects;
 use byteorder::{BigEndian, WriteBytesExt};
+use std::fmt::format;
 
 const HANDSHAKE_LEN: usize = 3;
 
@@ -24,8 +25,10 @@ fn accept_client(mut stream: TcpStream) -> std::io::Result<()> {
     return Ok(());
 }
 
-pub fn start_listening() -> std::io::Result<()> {
-    let listener = TcpListener::bind("127.0.0.1:3535")?;
+pub fn start_listening(host: &str, port: &str) -> std::io::Result<()> {
+    let listen_string = format!("{}:{}", host, port);
+
+    let listener = TcpListener::bind(listen_string)?;
     //listener.set_nonblocking(true)?;
 
     // accept connections and process them serially

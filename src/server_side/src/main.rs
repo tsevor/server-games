@@ -4,6 +4,8 @@ mod input;
 mod tcp_socket;
 use tcp_socket::start_listening;
 use std::sync::{Arc, Mutex};
+use std::env;
+use std::process;
 use crossterm::event::{self, Event, KeyCode};
 use crossterm::terminal::{enable_raw_mode, disable_raw_mode};
 
@@ -14,7 +16,12 @@ use std::io::Write;
 
 
 fn main() {
-    
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() != 3 {
+        println!("Format: {} <ip> <port>", args[0]);
+        process::exit(0);
+    }
     //input arc method (arc is a wayt to share data between threads mutex makes it mutable)
     enable_raw_mode().unwrap();
     let mut quit = false;
@@ -38,7 +45,7 @@ fn main() {
         }
     }
     std::io::stdout().flush().unwrap();
-    let _ = start_listening();
+    let _ = start_listening(&args[1],&args[2]);
     print!("\x1b[2J");
     print!("\x1b[?25h");
     print!("\x1b[0m");
