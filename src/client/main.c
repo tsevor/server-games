@@ -30,6 +30,20 @@ void cleanup() {
 }
 
 
+void send_keyboard() {
+	if (!socket) {
+		return;
+	}
+	int numKeys;
+	uint8_t* state = SDL_GetKeyboardState(&numKeys);
+	printf("%d\n", numKeys);
+	for (int i = 0; i < numKeys; i++) {
+		SDLNet_TCP_Send(socket, "sup", 3);
+	}
+
+}
+
+
 int main(int argc, char* argv[]) {
 	if (argc != 3) {
 		SDL_Log("Usage: %s <IP_ADDRESS> <PORT>\n", argv[0]);
