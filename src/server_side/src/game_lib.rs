@@ -159,8 +159,19 @@ impl GameObjects {
     }
 
     pub fn get_rect(&self, key: &str) -> Rect{
-        self.rects.get(key)
+        if let Some(result) = self.rects.get(key){
+            return *result;
+            //note unwrap is unsafe for errors custom error codes below
+        }else{
+            eprintln!("no key found int {}at line {}",file!(),line!());
+        }
+        return Rect::new(0,0,0,0);
     }
+    //to-do set rect because 
+    //to_do set size rect
+    //to_do move rect
+    //we have to do this because ownership rules in rust
+    // pub fn set_rect();
     pub fn rects(&self) -> &[Rect] {
         let values: Vec<Rect> = self.rects.values().cloned().collect();
         return values 

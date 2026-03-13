@@ -36,16 +36,24 @@ fn main() {
         std::io::stdout().flush().unwrap();
 
         //keyboard input
-        if event::poll(std::time::Duration::from_millis(10)).unwrap() {
-            if let Event::Key(key) = event::read().unwrap() {
-                match key.code {
-                    KeyCode::Char('q') => {
-                        quit = true;
-                        break;
+        if event::poll(std::time::Duration::from_millis(10)) {
+            match event::read(){
+                Ok (event)=>{
+                    if let Event::Key(key) = event::read().unwrap() {
+                        match key.code {
+                            KeyCode::Char('q') => {
+                                quit = true;
+                                break;
+                            }
+                            _ => {}
+                        }
                     }
-                    _ => {}
+                }
+                Err(e) => {
+                eprint!("failed to read event: {}", e);
                 }
             }
+            
         }
     }
     std::io::stdout().flush().unwrap();
