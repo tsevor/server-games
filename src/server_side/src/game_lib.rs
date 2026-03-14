@@ -1,183 +1,197 @@
-use std::sync::atomic::{AtomicU16, Ordering};
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicU32, Ordering};
 
-static ID_COUNTER: AtomicU16 = AtomicU16::new(0);
+static ID_COUNTER: AtomicU32 = AtomicU32::new(1);
 
-// data structures for game objects and packets
+fn next_id() -> u32 {
+    ID_COUNTER.fetch_add(1, Ordering::Relaxed)
+}
+
+#[derive(Debug, Clone)]
+pub struct Transform {
+    pub x: u16,
+    pub y: u16,
+    pub width: u16,
+    pub height: u16,
+    pub rgb: (u8,u8,u8),
+}
+
+impl Transform {
+    pub fn new(x: u16, y: u16, width: u16, height: u16, rgb: (u8,u8,u8)) -> Self {
+        Self { x, y, width, height, rgb }
+    }
+
+    pub fn move_by(&mut self, dx: u16, dy: u16) {
+        self.x += dx;
+        self.y += dy;
+    }
+
+    pub fn set_pos(&mut self, x: u16, y: u16) {
+        self.x = x;
+        self.y = y;
+    }
+
+    pub fn pos(&self) -> (u16, u16) {
+        (self.x, self.y)
+    }
+
+    pub fn size(&self) -> (u16, u16) {
+        (self.width, self.height)
+    }
+    pub fn color(&self) -> (u8,u8,u8){
+        self.rgb
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Rect {
-    pub id: u16,
-    pub x:u16,
-    pub y:u16,
-    pub width:u16,
-    pub height:u16,
+    pub transform: Transform,
 }
+
+#[derive(Debug, Clone)]
 pub struct Circle {
-    pub id: u16,
-    pub x:u16,
-    pub y:u16,
-    pub width:u16,
-    pub height:u16,
+    pub transform: Transform,
 }
+
+#[derive(Debug, Clone)]
 pub struct Image {
-    pub id: u16,
-    pub x:u16,
-    pub y:u16,
-    pub width:u16,
-    pub height:u16,
+    pub transform: Transform,
     pub src: String,
 }
+
+#[derive(Debug, Clone)]
 pub struct Polygon {
-    pub id: u16,
-    points: Vec<(u16,u16)>,
+    pub points: Vec<(u16, u16)>,
 }
 
-pub struct GameObjects {
-    rects: HashMap<String, Rect>,
-    circles: HashMap<String, Circle>,
-    images: HashMap<String, Image>,
-    polygons: HashMap<String, Polygon>,
-}
-
-pub enum ObjectTypes {
+#[derive(Debug, Clone)]
+pub enum GameObject {
     Rect(Rect),
     Circle(Circle),
     Image(Image),
     Polygon(Polygon),
 }
 
-// impl methods for game objects
-
-impl Rect {
-    pub fn new(x:u16, y:u16, width:u16, height:u16) -> Self{
-        ID_COUNTER.fetch_add(1, Ordering::SeqCst);
-        Self { id: ID_COUNTER.load(Ordering::SeqCst), x, y, width, height }
-   }
-    pub fn move_by(&mut self, dx:u16, dy:u16) {
-        self.x += dx;
-        self.y += dy;
-    }
-    pub fn set_pos(&mut self , x:u16, y:u16){
-        self.x = x;
-        self.y = y;
-    }
-    pub fn pos(&self) -> (u16,u16) {
-        (self.x, self.y)
-    }
-    pub fn size(&self) -> (u16,u16) {
-        (self.width, self.height)
-    }
+pub struct GameWorld {
+    objects: HashMap<u32, GameObject>,
 }
 
-
-impl Circle {
-    pub fn new(x:u16, y:u16, width:u16, height:u16) -> Self {
-        ID_COUNTER.fetch_add(1, Ordering::SeqCst);
-        Circle { id: ID_COUNTER.load(Ordering::SeqCst), x, y, width, height }
-    }
-    pub fn move_by(&mut self, dx:u16, dy:u16) {
-        self.x += dx;
-        self.y += dy;
-    }
-    pub fn set_pos(&mut self , x:u16, y:u16){
-        self.x = x;
-        self.y = y;
-    }
-    pub fn pos(&self) -> (u16,u16) {
-        (self.x, self.y)
-    }
-    pub fn size(&self) -> (u16,u16) {
-        (self.width, self.height)
-    }
-} 
-
-impl Image {
-    fn new(x:u16, y:u16, width:u16, height:u16, src:String) -> Self {
-        ID_COUNTER.fetch_add(1, Ordering::SeqCst);
-        Image { id: ID_COUNTER.load(Ordering::SeqCst), x, y, width, height, src }
-    }
-    pub fn move_by(&mut self, dx:u16, dy:u16) {
-        self.x += dx;
-        self.y += dy;
-    }
-    pub fn set_pos(&mut self , x:u16, y:u16){
-        self.x = x;
-        self.y = y;
-    }
-    pub fn pos(&self) -> (u16,u16) {
-        (self.x, self.y)
-    }
-    pub fn size(&self) -> (u16,u16) {
-        (self.width, self.height)
-    }
-}
-
-impl Polygon {
-    fn new(points: Vec<(u16,u16)>) -> Self {
-        ID_COUNTER.fetch_add(1, Ordering::SeqCst);
-        Polygon { id: ID_COUNTER.load(Ordering::SeqCst), points }
-    }
-    pub fn move_by(&mut self, dx:u16, dy:u16) {
-        for point in &mut self.points {
-            point.0 += dx;
-            point.1 += dy;
-        }
-    }
-    pub fn set_pos(&mut self , x:u16, y:u16){
-        let (current_x, current_y) = self.pos();
-        let dx = x - current_x;
-        let dy = y - current_y;
-        self.move_by(dx, dy);
-    }
-    pub fn pos(&self) -> (u16,u16) {
-        if let Some(first_point) = self.points.first() {
-            *first_point
-        } else {
-            (0, 0)
-        }
-    }
-    pub fn size(&self) -> usize {
-        self.points.len()
-    }
-}
-
-impl GameObjects {
+impl GameWorld {
     pub fn new() -> Self {
-        GameObjects {
-            rects: HashMap::new(),
-            circles: HashMap::new(),
-            images: HashMap::new(),
-            polygons: HashMap::new(),
-        }
-    }
-    pub fn add_object(&mut self, key: &str, obj: ObjectTypes) {
-        match obj {
-            ObjectTypes::Rect(rect) => { self.rects.insert(key.to_string(), rect); }
-            ObjectTypes::Circle(circle) => { self.circles.insert(key.to_string(), circle); }
-            ObjectTypes::Image(image) => { self.images.insert(key.to_string(), image); }
-            ObjectTypes::Polygon(polygon) => { self.polygons.insert(key.to_string(), polygon); }
+        Self {
+            objects: HashMap::new(),
         }
     }
 
-    pub fn get_rect(&self, key: &str) -> Rect{
-        if let Some(result) = self.rects.get(key){
-            return *result;
-            //note unwrap is unsafe for errors custom error codes below
-        }else{
-            eprintln!("no key found int {}at line {}",file!(),line!());
+    // ========================
+    // Object Creation
+    // ========================
+
+    pub fn create_rect(&mut self, x: u16, y: u16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
+        let id = next_id();
+
+        let rect = Rect {
+            transform: Transform::new(x, y, w, h, rgb),
+        };
+
+        self.objects.insert(id, GameObject::Rect(rect));
+        id
+    }
+
+    pub fn create_circle(&mut self, x: u16, y: u16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
+        let id = next_id();
+
+        let circle = Circle {
+            transform: Transform::new(x, y, w, h, rgb),
+        };
+
+        self.objects.insert(id, GameObject::Circle(circle));
+        id
+    }
+
+    pub fn create_image(
+        &mut self,
+        x: u16,
+        y: u16,
+        w: u16,
+        h: u16,
+        src: String,
+        rgb: (u8,u8,u8),
+    ) -> u32 {
+        let id = next_id();
+
+        let image = Image {
+            transform: Transform::new(x, y, w, h, rgb),
+            src,
+        };
+
+        self.objects.insert(id, GameObject::Image(image));
+        id
+    }
+
+    pub fn create_polygon(&mut self, points: Vec<(u16, u16)>) -> u32 {
+        let id = next_id();
+
+        let polygon = Polygon { points };
+
+        self.objects.insert(id, GameObject::Polygon(polygon));
+        id
+    }
+
+    // ========================
+    // Object Access
+    // ========================
+
+    pub fn get(&self, id: u32) -> Option<&GameObject> {
+        self.objects.get(&id)
+    }
+
+    pub fn get_mut(&mut self, id: u32) -> Option<&mut GameObject> {
+        self.objects.get_mut(&id)
+    }
+
+    pub fn all(&self) -> impl Iterator<Item = (&u32, &GameObject)> {
+        self.objects.iter()
+    }
+
+    // ========================
+    // Transform Manipulation
+    // ========================
+
+    pub fn move_object(&mut self, id: u32, dx: u16, dy: u16) {
+        if let Some(obj) = self.objects.get_mut(&id) {
+            match obj {
+                GameObject::Rect(r) => r.transform.move_by(dx, dy),
+                GameObject::Circle(c) => c.transform.move_by(dx, dy),
+                GameObject::Image(i) => i.transform.move_by(dx, dy),
+                GameObject::Polygon(p) => {
+                    for point in &mut p.points {
+                        point.0 += dx;
+                        point.1 += dy;
+                    }
+                }
+            }
         }
-        return Rect::new(0,0,0,0);
     }
-    //to-do set rect because 
-    //to_do set size rect
-    //to_do move rect
-    //we have to do this because ownership rules in rust
-    // pub fn set_rect();
-    pub fn rects(&self) -> &[Rect] {
-        let values: Vec<Rect> = self.rects.values().cloned().collect();
-        return values 
-    }
-    pub fn circles(&self) -> &[Circle] {
-        let values: Vec<Circle> = self.circles.values().cloned().collect();
-        return values 
+
+    pub fn set_position(&mut self, id: u32, x: u16, y: u16) {
+        if let Some(obj) = self.objects.get_mut(&id) {
+            match obj {
+                GameObject::Rect(r) => r.transform.set_pos(x, y),
+                GameObject::Circle(c) => c.transform.set_pos(x, y),
+                GameObject::Image(i) => i.transform.set_pos(x, y),
+                GameObject::Polygon(p) => {
+                    if let Some((cx, cy)) = p.points.first().copied() {
+                        let dx = x - cx;
+                        let dy = y - cy;
+
+                        for point in &mut p.points {
+                            point.0 += dx;
+                            point.1 += dy;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 	int r = SDLNet_TCP_Recv(socket, buf, 3);
 
 	if (r > 0) {
-		// ensure the server replied "hey bud"
+		// ensure the server replied "sup"
 		if (r == 3 && strncmp(buf, "sup", 3) == 0) {
 			SDL_Log("Handshake successful!");
 		} else {

@@ -3,7 +3,7 @@ mod game_lib;
 mod input;
 mod tcp_socket;
 use tcp_socket::start_listening;
-use std::sync::{Arc, Mutex};
+// use std::sync::{Arc, Mutex}; // Might need this later but removed to get rid of annoying warning
 use std::env;
 use std::process;
 use crossterm::event::{self, Event, KeyCode};
@@ -36,7 +36,7 @@ fn main() {
         std::io::stdout().flush().unwrap();
 
         //keyboard input
-        if event::poll(std::time::Duration::from_millis(10)) {
+        if event::poll(std::time::Duration::from_millis(10)).expect("POLL ERROR") {
             match event::read(){
                 Ok (event)=>{
                     if let Event::Key(key) = event::read().unwrap() {
