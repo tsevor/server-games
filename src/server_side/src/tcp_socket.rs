@@ -42,10 +42,19 @@ pub fn start_listening(host: &str, port: &str) -> std::io::Result<()> {
     Ok(())
 }
 
+pub fn push_background_color(world: &GameWorld, data: &mut Vec<u8>) {
+    let (r, g, b) = world.background_color();
+    data.push(1); // background color packet
+    data.push(r);
+    data.push(g);
+    data.push(b);
+}
+
 pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), Box<dyn std::error::Error>> {
     println!("Serializing game state...");
     // Serialize game state and send to client
     let mut data: Vec<u8> = Vec::new();
+    push_background_color(world, &mut data);
 
     let mut rect_vec: Vec<u8> = Vec::new();
     rect_vec.push(4);

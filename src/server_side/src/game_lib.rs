@@ -33,7 +33,7 @@ impl Transform {
 
     pub fn pos(&self) -> (u16, u16) {
         (self.x, self.y)
-    }
+    }// This is a placeholder. In a real implementation, you'd store this in the GameWorld struct.
 
     pub fn size(&self) -> (u16, u16) {
         (self.width, self.height)
@@ -73,15 +73,34 @@ pub enum GameObject {
 }
 
 pub struct GameWorld {
+    background_color: (u8, u8, u8),
     objects: HashMap<u32, GameObject>,
 }
 
 impl GameWorld {
     pub fn new() -> Self {
         Self {
+            background_color: (0, 0, 0),
             objects: HashMap::new(),
         }
     }
+
+    //========================
+    // World Settings
+    //========================
+
+    pub fn set_background_color(&mut self, r: u8, g: u8, b: u8) {
+        self.background_color = (r, g, b);
+    }
+
+    pub fn background_color(&self) -> (u8, u8, u8) {
+        self.background_color
+    }
+
+    pub fn clear(&mut self) {
+        self.objects.clear();
+    }
+
 
     // ========================
     // Object Creation
