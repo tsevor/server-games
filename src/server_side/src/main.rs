@@ -2,6 +2,7 @@ mod games;
 mod game_lib;
 mod input;
 mod tcp_socket;
+mod terminal_lib;
 use tcp_socket::start_listening;
 use std::sync::{Arc, Mutex};
 use crossterm::event::{self, Event, KeyCode};
@@ -93,6 +94,7 @@ fn terminal_ui(){
     print!(" ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀");
     print!("\x1b[48;5;67m");
     print!("\x1b[48;5;62m");
+    terminal_lib::add_window(30,30,"testing");
     
     std::io::stdout().flush().unwrap();
 }
