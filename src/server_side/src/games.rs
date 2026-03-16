@@ -35,17 +35,23 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
         world.move_object(rect_id, 1, 0);
         send_game_state(&mut stream, &world);
         let mut buffer = [0; 1028];
-        // let bytes_read = stream.read(&mut buffer)?;
+        let bytes_read = stream.read(&mut buffer)?;
         
         
-        /* if bytes_read == 0 {
+        if bytes_read == 0 {
             // Connection closed by the peer
             println!("Connection closed");
             break Ok(());
         }
+        match buffer[0] {
+            20 => break Ok(()), // Normal code
+            _ => {}
+            // Put other codes here
+        }
 
-        println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read])*/
-        std::thread::sleep(std::time::Duration::from_millis(100));
+
+        println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read]);
+        std::thread::sleep(std::time::Duration::from_millis(10));
     
     }
 }

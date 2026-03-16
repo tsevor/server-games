@@ -33,6 +33,7 @@ server responds with `sup`
 | 02 | key released   | K
 | 03 | mouse state    | XXYY[button bits: 87654mrl]
 | 04 | keyboard state | every K that is pressed
+| 20 | keep alive code|
 
 
 key codes in `src/client/keys.h`
