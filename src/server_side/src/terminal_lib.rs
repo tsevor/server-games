@@ -61,7 +61,7 @@ pub fn add_window(x: i8, y: i8, message: &str) {
 
 pub
 
-fn Text(x: i8, y: i8, message: &str) {
+fn text(x: i8, y: i8, message: &str) {
     move_to(x, y);
     print!("{}", message);
     io::stdout().flush().unwrap();
