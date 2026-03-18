@@ -18,7 +18,7 @@ uint16_t serverPort;
 
 TCPsocket socket;
 
-const uint8_t KEEP_ALIVE = 20;
+const uint8_t KEEP_ALIVE = 1;
 
 
 void cleanup() {
@@ -46,8 +46,8 @@ void send_keyboard() {
 	for (int i = 0; i < numKeys; i++) {
 		if (state[i]) {
 			printf("Key %s is pressed\n", SDL_GetKeyName(i));
+			// SDLNet_TCP_Send(socket, &state[i], 1);
 		}
-		// SDLNet_TCP_Send(socket, &state[i], 1);
 	}
 
 }
@@ -216,6 +216,8 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		}
+		case 0x80:
+			
 		default:
 			SDL_Log("Unknown packet type: 0x%02x", packet_type);
 			break;

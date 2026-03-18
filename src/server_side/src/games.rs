@@ -44,7 +44,7 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
             break Ok(());
         }
         match buffer[0] {
-            20 => {
+            1 => {
                 // println!("normal byte");
             } // Normal code
             _ => {}
