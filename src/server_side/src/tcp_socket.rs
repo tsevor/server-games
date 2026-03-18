@@ -51,7 +51,7 @@ pub fn push_background_color(world: &GameWorld, data: &mut Vec<u8>) {
 }
 
 pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Serializing game state...");
+    // println!("Serializing game state...");
     // Serialize game state and send to client
     let mut data: Vec<u8> = Vec::new();
     push_background_color(world, &mut data);
@@ -160,20 +160,16 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
     }*/
 
     rect_vec.insert(1, rect_count);
-    println!("Sending: {:?}",rect_vec.len()); // Length being weird...
-    println!("Sending: {:?}",rect_vec);
     circle_vec.insert(1, circle_count); // Insert length at the beginning
     if rect_count > 0 { data.append(&mut rect_vec); }
     
     if circle_count > 0 { data.append(&mut circle_vec); }
 	data.push(0); // refresh screen
-
-    println!("Sending: {:?}",data);
     let mut bytes = Vec::with_capacity(data.len() * 2);
     for n in data {
         bytes.write_u8(n)? // network byte order
     }
-    println!("Sending bytes: {:?}",bytes);
+    // println!("Sending bytes: {:?}",bytes);
 	stream.write_all(&bytes)?;
     Ok(())
 }

@@ -44,13 +44,15 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
             break Ok(());
         }
         match buffer[0] {
-            20 => break Ok(()), // Normal code
+            20 => {
+                // println!("normal byte");
+            } // Normal code
             _ => {}
             // Put other codes here
         }
 
 
-        println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read]);
+        // println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read]);
         std::thread::sleep(std::time::Duration::from_millis(10));
     
     }

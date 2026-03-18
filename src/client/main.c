@@ -18,7 +18,7 @@ uint16_t serverPort;
 
 TCPsocket socket;
 
-const int KEEP_ALIVE = 20;
+const uint8_t KEEP_ALIVE = 20;
 
 
 void cleanup() {
