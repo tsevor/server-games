@@ -7,11 +7,14 @@
 
 #include "drawing.h"
 
+uint64_t lastTime;
+
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
 IPaddress ip;
-uint16_t server_port;
+char *serverIP;
+uint16_t serverPort;
 
 TCPsocket socket;
 
@@ -50,8 +53,8 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	char *server_ip = argv[1];
-	server_port = atoi(argv[2]);
+	serverIP = argv[1];
+	serverPort = atoi(argv[2]);
 	
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
@@ -69,8 +72,8 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	if (SDLNet_ResolveHost(&ip, server_ip, server_port) < 0) {
-		SDL_Log("Failed to resolve host %s:%d : %s", server_ip, server_port, SDLNet_GetError());
+	if (SDLNet_ResolveHost(&ip, serverIP, serverPort) < 0) {
+		SDL_Log("Failed to resolve host %s:%d : %s", serverIP, serverPort, SDLNet_GetError());
 		SDLNet_Quit();
 		SDL_Quit();
 		return -1;
@@ -78,12 +81,12 @@ int main(int argc, char *argv[]) {
 	
 	socket = SDLNet_TCP_Open(&ip);
 	if (!socket) {
-		SDL_Log("Failed to connect to %s:%d : %s", server_ip, server_port, SDLNet_GetError());
+		SDL_Log("Failed to connect to %s:%d : %s", serverIP, serverPort, SDLNet_GetError());
 		cleanup();
 		return -1;
 	}
 
-	SDL_Log("Successfully connected to %s:%d", server_ip, server_port);
+	SDL_Log("Successfully connected to %s:%d", serverIP, serverPort);
 
 	SDLNet_TCP_Send(socket, "hey", 3);
 	uint8_t buf[4];
