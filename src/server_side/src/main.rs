@@ -2,12 +2,14 @@ mod games;
 mod game_lib;
 mod input;
 mod tcp_socket;
+mod terminal_lib;
 use tcp_socket::start_listening;
-use std::sync::{Arc, Mutex};
+// use std::sync::{Arc, Mutex}; // Might need this later but removed to get rid of annoying warning
 use std::env;
 use std::process;
 use crossterm::event::{self, Event, KeyCode};
 use crossterm::terminal::{enable_raw_mode, disable_raw_mode};
+use std::thread;
 
 use std::io::Write;
 
@@ -26,26 +28,36 @@ fn main() {
     enable_raw_mode().unwrap();
     let mut quit = false;
     terminal_ui();
+    thread::spawn(move || {
+        let _ = start_listening(&args[1],&args[2]);
+    });
     while  !quit {
         
         print!("\x1b[48;5;67m");
         std::io::stdout().flush().unwrap();
 
         //keyboard input
-        if event::poll(std::time::Duration::from_millis(10)).unwrap() {
-            if let Event::Key(key) = event::read().unwrap() {
-                match key.code {
-                    KeyCode::Char('q') => {
-                        quit = true;
-                        break;
+        if event::poll(std::time::Duration::from_millis(10)).expect("POLL ERROR") {
+            match event::read(){
+                Ok (event)=>{
+                    if let Event::Key(key) = event::read().unwrap() {
+                        match key.code {
+                            KeyCode::Char('q') => {
+                                quit = true;
+                                break;
+                            }
+                            _ => {}
+                        }
                     }
-                    _ => {}
+                }
+                Err(e) => {
+                eprint!("failed to read event: {}", e);
                 }
             }
+            
         }
     }
     std::io::stdout().flush().unwrap();
-    let _ = start_listening(&args[1],&args[2]);
     print!("\x1b[2J");
     print!("\x1b[?25h");
     print!("\x1b[0m");
@@ -100,6 +112,7 @@ fn terminal_ui(){
     print!(" ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀");
     print!("\x1b[48;5;67m");
     print!("\x1b[48;5;62m");
+    terminal_lib::add_window(30,30,"testing");
     
     std::io::stdout().flush().unwrap();
 }

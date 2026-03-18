@@ -18,6 +18,9 @@ uint16_t serverPort;
 
 TCPsocket socket;
 
+const int KEEP_ALIVE = 20;
+
+
 void cleanup() {
 	if (renderer) {
 		SDL_DestroyRenderer(renderer);
@@ -93,7 +96,7 @@ int main(int argc, char *argv[]) {
 	int r = SDLNet_TCP_Recv(socket, buf, 3);
 
 	if (r > 0) {
-		// ensure the server replied "hey bud"
+		// ensure the server replied "sup"
 		if (r == 3 && strncmp(buf, "sup", 3) == 0) {
 			SDL_Log("Handshake successful!");
 		} else {
@@ -150,6 +153,7 @@ int main(int argc, char *argv[]) {
 		switch (packet_type) {
 		case 0x00: // refresh screen
 			refresh(renderer);
+			int result = SDLNet_TCP_Send(socket, &KEEP_ALIVE, sizeof(KEEP_ALIVE));
 			break;
 		case 0x01: { // fill screen with RGB color
 			uint8_t color_buf[3];
