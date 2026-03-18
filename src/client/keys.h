@@ -89,7 +89,6 @@ uint8_t scancode_to_ascii(uint8_t scancode) {
 		case SDL_SCANCODE_F11: return 151;
 		case SDL_SCANCODE_F12: return 152;
 
-		//number pad keys
 		case SDL_SCANCODE_KP_1: return 153;
 		case SDL_SCANCODE_KP_2: return 154;
 		case SDL_SCANCODE_KP_3: return 155;

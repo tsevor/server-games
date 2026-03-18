@@ -28,15 +28,19 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
 
     world.move_object(rect_id, 5, 5);
     world.set_position(circle_id, 200, 200);
-    // let mut test2 = Circle::new(100, 50, 20, 40);
-    // objects.add_object(ObjectTypes::Circle(test2));
-    
+    let mut rect_direction: i16 = 1;
     loop {
-        world.move_object(rect_id, 1, 0);
+        world.move_object(rect_id, rect_direction, 0);
         send_game_state(&mut stream, &world);
         let mut buffer = [0; 1028];
         let bytes_read = stream.read(&mut buffer)?;
-        
+        if let Some(obj) = world.get(id) {
+            if let Some((x, y)) = obj.pos() {
+                if x > 500 || x < 500  {
+                    rect_direction = rect_direction * -1;
+                }
+            }
+        }
         
         if bytes_read == 0 {
             // Connection closed by the peer

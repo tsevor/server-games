@@ -177,7 +177,7 @@ impl GameWorld {
     // Transform Manipulation
     // ========================
 
-    pub fn move_object(&mut self, id: u32, dx: u16, dy: u16) {
+    pub fn move_object(&mut self, id: u32, dx: i16, dy: i16) {
         if let Some(obj) = self.objects.get_mut(&id) {
             match obj {
                 GameObject::Rect(r) => r.transform.move_by(dx, dy),
@@ -210,6 +210,17 @@ impl GameWorld {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    pub fn pos(&self, id: u32) -> Option<(u16, u16)> {
+        if let Some(obj) = self.objects.get_mut(&id) {
+            match self {
+                GameObject::Rect(r) => Some(r.transform.pos()),
+                GameObject::Circle(c) => Some(c.transform.pos()),
+                GameObject::Image(i) => Some(i.transform.pos()),
+                GameObject::Polygon(p) => p.points.first().copied(),
             }
         }
     }
