@@ -23,17 +23,17 @@ server responds with `sup`
 | 08 | fill polygon   | NRGBXXYY(XXYY)
 | 09 | draw polygon   | NRGBXXYY(XXYY)
 | 80 | request kb     | -
+| 81 | request mouse  | -
 
 ### client to server
 
 | ID | NAME           | BYTES
 | -- | -------------- | -----
 | 00 | -------        | -
-| 01 | key pressed    | K
+| 01 | keep alive     | -
 | 02 | key released   | K
-| 03 | mouse state    | XXYY[button bits: 87654mrl]
-| 04 | keyboard state | every K that is pressed
-| 20 | keep alive code|
+| 03 | keyboard state | N(K)
+| 04 | mouse state    | XXYY[button bits: 87654rml]
 
 
 key codes in `src/client/keys.h`
