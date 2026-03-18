@@ -44,7 +44,10 @@ void send_keyboard() {
 	uint8_t* state = SDL_GetKeyboardState(&numKeys);
 	printf("%d\n", numKeys);
 	for (int i = 0; i < numKeys; i++) {
-		SDLNet_TCP_Send(socket, "sup", 3);
+		if (state[i]) {
+			printf("Key %s is pressed\n", SDL_GetKeyName(i));
+		}
+		// SDLNet_TCP_Send(socket, &state[i], 1);
 	}
 
 }
@@ -217,6 +220,10 @@ int main(int argc, char *argv[]) {
 			SDL_Log("Unknown packet type: 0x%02x", packet_type);
 			break;
 		}
+
+		SDL_Delay(1);
+
+		send_keyboard();
 
 	}
 
