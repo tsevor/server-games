@@ -32,7 +32,7 @@ server responds with `sup`
 | 00 | -------        | -
 | 01 | keep alive     | -
 | 02 | key released   | K
-| 03 | keyboard state | N(K)
+| 03 | keyboard state | N([key pressed in ascii])
 | 04 | mouse state    | XXYY[button bits: 87654rml]
 
 

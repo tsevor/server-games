@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #include "drawing.h"
+#include "keys.h"
 
 uint64_t lastTime;
 
@@ -40,16 +40,37 @@ void send_keyboard() {
 	if (!socket) {
 		return;
 	}
+	// send as N([key pressed in ascii])
 	int numKeys;
+	uint8_t buf[256];
+	buf[0] = 0x03; // id
+	uint8_t count = 2;
 	uint8_t* state = SDL_GetKeyboardState(&numKeys);
-	printf("%d\n", numKeys);
 	for (int i = 0; i < numKeys; i++) {
 		if (state[i]) {
-			printf("Key %s is pressed\n", SDL_GetKeyName(i));
-			// SDLNet_TCP_Send(socket, &state[i], 1);
+			buf[count++] = scancode_to_ascii(i);
+			if (count >= 255) {
+				break;
+			}
 		}
 	}
+	buf[1] = count - 2; // number of keys
+	SDLNet_TCP_Send(socket, buf, count);
+}
 
+
+void send_mouse() {
+	if (!socket) {
+		return;
+	}
+	int x, y;
+	uint32_t buttons = SDL_GetMouseState(&x, &y);
+	// send as XXYY[button bits: 87654rml]
+	uint8_t buf[5];
+	((uint16_t*)buf)[0] = x;
+	((uint16_t*)buf)[1] = y;
+	buf[4] = buttons & 0xff;
+	SDLNet_TCP_Send(socket, buf, 5);
 }
 
 
@@ -217,15 +238,15 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		case 0x80:
-			
+			send_keyboard();
+			break;
+		case 0x81:
+			send_mouse();
+			break;
 		default:
 			SDL_Log("Unknown packet type: 0x%02x", packet_type);
 			break;
 		}
-
-		SDL_Delay(1);
-
-		send_keyboard();
 
 	}
 
