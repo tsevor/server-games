@@ -7,8 +7,6 @@
 #include "drawing.h"
 #include "keys.h"
 
-uint64_t lastTime;
-
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
@@ -45,7 +43,7 @@ void send_keyboard() {
 	uint8_t buf[256];
 	buf[0] = 0x03; // id
 	uint8_t count = 2;
-	uint8_t* state = SDL_GetKeyboardState(&numKeys);
+	const uint8_t* state = SDL_GetKeyboardState(&numKeys);
 	for (int i = 0; i < numKeys; i++) {
 		if (state[i]) {
 			buf[count++] = scancode_to_ascii(i);
@@ -89,16 +87,14 @@ int main(int argc, char *argv[]) {
 	}
 
 	
-	SDL_CreateWindowAndRenderer(640, 480, 0, &window, &renderer);
-	SDL_SetWindowTitle(window, "Server Game Client");
-
-
+	
+	
 	if (SDLNet_Init() < 0) {
 		SDL_Log("Failed to initialize SDL_net: %s", SDLNet_GetError());
 		SDL_Quit();
 		return -1;
 	}
-
+	
 	if (SDLNet_ResolveHost(&ip, serverIP, serverPort) < 0) {
 		SDL_Log("Failed to resolve host %s:%d : %s", serverIP, serverPort, SDLNet_GetError());
 		SDLNet_Quit();
@@ -112,13 +108,13 @@ int main(int argc, char *argv[]) {
 		cleanup();
 		return -1;
 	}
-
+	
 	SDL_Log("Successfully connected to %s:%d", serverIP, serverPort);
-
+	
 	SDLNet_TCP_Send(socket, "hey", 3);
 	uint8_t buf[4];
 	int r = SDLNet_TCP_Recv(socket, buf, 3);
-
+	
 	if (r > 0) {
 		// ensure the server replied "sup"
 		if (r == 3 && strncmp(buf, "sup", 3) == 0) {
@@ -133,7 +129,7 @@ int main(int argc, char *argv[]) {
 		cleanup();
 		return -1;
 	}
-
+	
 	SDLNet_SocketSet socketSet = SDLNet_AllocSocketSet(1);
 	if (!socketSet) {
 		SDL_Log("Failed to allocate socket set: %s", SDLNet_GetError());
@@ -141,7 +137,21 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 	SDLNet_TCP_AddSocket(socketSet, socket);
+	
+	r = SDLNet_TCP_Recv(socket, buf, 4);
+	if (r != 4) {
+		SDL_Log("Failed to receive window size: %s", SDLNet_GetError());
+		cleanup();
+		return -1;
+	}
+	
+	int w = ((uint16_t*)buf)[0];
+	int h = ((uint16_t*)buf)[1];
+	
 
+	SDL_CreateWindowAndRenderer(w, h, 0, &window, &renderer);
+	SDL_SetWindowTitle(window, "Server Game Client");
+	
 	int app_quit = 0;
 	SDL_Event event;
 
@@ -192,17 +202,17 @@ int main(int argc, char *argv[]) {
 			// unimplemented for now because it's a bad idea and too hard
 			break;
 		case 0x03: { // draw points: NRGB(XXYY)
-			uint8_t header[1];
-			r = SDLNet_TCP_Recv(socket, header, 1);
-			if (r != 1) break;
+			uint8_t header[4];
+			r = SDLNet_TCP_Recv(socket, header, 4);
+			if (r != 4) break;
 			uint8_t n = header[0];
+			SDL_Color color = {header[1], header[2], header[3], 255};
 			for (int i = 0; i < n; i++) {
-				uint8_t point_buf[7];
-				r = SDLNet_TCP_Recv(socket, point_buf, 7);
-				if (r != 7) break;
-				SDL_Color color = {point_buf[0], point_buf[1], point_buf[2], 255};
-				int x = point_buf[3] | (point_buf[4] << 8);
-				int y = point_buf[5] | (point_buf[6] << 8);
+				uint8_t point_buf[4];
+				r = SDLNet_TCP_Recv(socket, point_buf, 4);
+				if (r != 4) break;
+				int x = ((uint16_t*)point_buf)[0];
+				int y = ((uint16_t*)point_buf)[1];
 				drawPoint(renderer, x, y, color);
 			}
 			break;
@@ -211,19 +221,19 @@ int main(int argc, char *argv[]) {
 		case 0x05: // draw rects: NRGB(XXYYWWHH)
 		case 0x06: // fill ellipses: NRGB(XXYYWWHH)
 		case 0x07: { // draw ellipses: NRGB(XXYYWWHH)
-			uint8_t header[1];
-			r = SDLNet_TCP_Recv(socket, header, 1);
-			if (r != 1) break;
+			uint8_t header[4];
+			r = SDLNet_TCP_Recv(socket, header, 4);
+			if (r != 4) break;
 			uint8_t n = header[0];
+			SDL_Color color = {header[1], header[2], header[3], 255};
 			for (int i = 0; i < n; i++) {
-				uint8_t rect_buf[11];
-				r = SDLNet_TCP_Recv(socket, rect_buf, 11);
-				if (r != 11) break;
-				SDL_Color color = {rect_buf[0], rect_buf[1], rect_buf[2], 255};
-				int x = rect_buf[3] | (rect_buf[4] << 8);
-				int y = rect_buf[5] | (rect_buf[6] << 8);
-				int w = rect_buf[7] | (rect_buf[8] << 8);
-				int h = rect_buf[9] | (rect_buf[10] << 8);
+				uint8_t rect_buf[8];
+				r = SDLNet_TCP_Recv(socket, rect_buf, 8);
+				if (r != 8) break;
+				int x = ((uint16_t*)rect_buf)[0];
+				int y = ((uint16_t*)rect_buf)[1];
+				int w = ((uint16_t*)rect_buf)[2];
+				int h = ((uint16_t*)rect_buf)[3];
 				SDL_Rect rect = {x, y, w, h};
 				if (packet_type == 0x04) {
 					fillRect(renderer, rect, color);
@@ -237,12 +247,44 @@ int main(int argc, char *argv[]) {
 			}
 			break;
 		}
+
 		case 0x80:
 			send_keyboard();
 			break;
 		case 0x81:
 			send_mouse();
 			break;
+		
+		case 0xc0: { // resize window: WWHH
+			uint8_t header[4];
+			r = SDLNet_TCP_Recv(socket, header, 4);
+			if (r != 4) break;
+			int w = ((uint16_t*)header)[0];
+			int h = ((uint16_t*)header)[1];
+			SDL_SetWindowSize(window, w, h);
+			break;
+		}
+		case 0xc1: { // rename window: L(TITLESTRING)
+			uint8_t str_len;
+			r = SDLNet_TCP_Recv(socket, &str_len, 1);
+			if (r != 1) break;
+			char *title = malloc(str_len + 1);
+			r = SDLNet_TCP_Recv(socket, title, str_len);
+			if (r != str_len) break;
+			title[str_len] = '\0'; // null terminate
+			SDL_SetWindowTitle(window, title);
+			free(title);
+			break;
+		}
+		case 0xc2: { // move window: XXYY
+			uint8_t pos_buf[4];
+			r = SDLNet_TCP_Recv(socket, pos_buf, 4);
+			if (r != 4) break;
+			int x = ((uint16_t*)pos_buf)[0];
+			int y = ((uint16_t*)pos_buf)[1];
+			SDL_SetWindowPosition(window, x, y);
+			break;
+		}
 		default:
 			SDL_Log("Unknown packet type: 0x%02x", packet_type);
 			break;
