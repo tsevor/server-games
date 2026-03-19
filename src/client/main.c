@@ -211,8 +211,8 @@ int main(int argc, char *argv[]) {
 				uint8_t point_buf[4];
 				r = SDLNet_TCP_Recv(socket, point_buf, 4);
 				if (r != 4) break;
-				int x = ((uint16_t*)point_buf)[0];
-				int y = ((uint16_t*)point_buf)[1];
+				int x = ((int16_t*)point_buf)[0];
+				int y = ((int16_t*)point_buf)[1];
 				drawPoint(renderer, x, y, color);
 			}
 			break;
@@ -230,8 +230,8 @@ int main(int argc, char *argv[]) {
 				uint8_t rect_buf[8];
 				r = SDLNet_TCP_Recv(socket, rect_buf, 8);
 				if (r != 8) break;
-				int x = ((uint16_t*)rect_buf)[0];
-				int y = ((uint16_t*)rect_buf)[1];
+				int x = ((int16_t*)rect_buf)[0];
+				int y = ((int16_t*)rect_buf)[1];
 				int w = ((uint16_t*)rect_buf)[2];
 				int h = ((uint16_t*)rect_buf)[3];
 				SDL_Rect rect = {x, y, w, h};
