@@ -1,13 +1,13 @@
 client: clean
-	gcc src/client/*.c -lSDL2 -lSDL2_gfx -lSDL2_net -lm -o bin/client
+	gcc src/client/*.c -lSDL2 -lSDL2_gfx -lSDL2_net -lm -llz4 -o bin/client
 
 windows: clean
-	x86_64-w64-mingw32-gcc src/client/*.c -lSDL2 -lSDL2_gfx -lSDL2_net -lm -o bin/client.exe
+	x86_64-w64-mingw32-gcc src/client/*.c -lSDL2 -lSDL2_gfx -lSDL2_net -lm -llz4 -o bin/client.exe
 
 all: client windows
 
 debug:
-	gcc -g src/client/*.c -lSDL2 -lSDL2_gfx -lSDL2_net -lm -o bin/client
+	gcc -g src/client/*.c -lSDL2 -lSDL2_gfx -lSDL2_net -lm -llz4 -o bin/client
 	gdb ./bin/client
 
 test: client

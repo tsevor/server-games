@@ -14,7 +14,7 @@ server responds with `supWWHH` the `WWHH` being the initial window size
 | -- | -------------- | -----
 | 00 | refresh        | -
 | 01 | fill           | RGB
-| 02 | image (gzip)   | SSXXYYWWHH{DATA}
+| 02 | image (LZ4)    | SSSSXXYYWWHH{RGBA8888}
 | 03 | points         | NRGB(XXYY)
 | 04 | fill rects     | NRGB(XXYYWWHH)
 | 05 | draw rects     | NRGB(XXYYWWHH)
