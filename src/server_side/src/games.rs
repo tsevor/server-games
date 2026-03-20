@@ -32,8 +32,9 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     // let mut test2 = Circle::new(100, 50, 20, 40);
     // objects.add_object(ObjectTypes::Circle(test2));
     loop {
-        world.move_object(rect_id, 1, 0);
+        
         let mut input = get_input(stream);
+        world.move_object(rect_id,  input.key_d - input.key_a, input.key_w - input.key_s);
         send_game_state(&mut stream, &world);
         
         let mut buffer = [0; 1028];
