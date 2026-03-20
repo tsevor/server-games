@@ -9,6 +9,7 @@ use byteorder::{WriteBytesExt};
 // use std::fmt::format; // Might need this later...
 
 const HANDSHAKE_LEN: usize = 3;
+const WINDOW_SIZE: (u16, u16) = (720, 540);
 
 fn accept_client(mut stream: TcpStream) -> std::io::Result<()> {
     let mut handshake = [0; HANDSHAKE_LEN];
@@ -16,7 +17,20 @@ fn accept_client(mut stream: TcpStream) -> std::io::Result<()> {
     //stream.set_nonblocking(true)?;
 
     if str::from_utf8(&handshake[..HANDSHAKE_LEN]) == Ok("hey") { 
-        let _ = stream.write(b"sup"); 
+        let mut data: Vec<u8> = Vec::new();
+        
+        data.push((WINDOW_SIZE.0 & 0xff) as u8);
+        data.push((WINDOW_SIZE.0 >> 8) as u8);
+        data.push((WINDOW_SIZE.1 & 0xff) as u8);
+        data.push((WINDOW_SIZE.1 >> 8) as u8);
+
+        let mut bytes = Vec::with_capacity(data.len() * 2);
+        bytes.extend_from_slice(b"sup");
+
+        for n in data {
+            bytes.write_u8(n)? // network byte order
+        }
+        let _ = stream.write(&bytes); 
     } else {
         println!("Connection closed");
         return Ok(());
