@@ -9,38 +9,29 @@ fn next_id() -> u32 {
 
 #[derive(Debug, Clone)]
 pub struct Transform {
-    pub x: u16,
-    pub y: u16,
+    pub x: i16,
+    pub y: i16,
     pub width: u16,
     pub height: u16,
     pub rgb: (u8,u8,u8),
 }
 
 impl Transform {
-    pub fn new(x: u16, y: u16, width: u16, height: u16, rgb: (u8,u8,u8)) -> Self {
+    pub fn new(x: i16, y: i16, width: u16, height: u16, rgb: (u8,u8,u8)) -> Self {
         Self { x, y, width, height, rgb }
     }
 
     pub fn move_by(&mut self, dx: i16, dy: i16) {
-        if dx >= 0 {
-            self.x += dx as u16;
-        } else {
-            self.x -= (-dx) as u16;
-        }
-
-        if dy >= 0 {
-            self.y += dy as u16;
-        } else {
-            self.y -= (-dy) as u16;
-        }
+        self.x += dx;
+        self.y += dy;
     }
 
-    pub fn set_pos(&mut self, x: u16, y: u16) {
+    pub fn set_pos(&mut self, x: i16, y: i16) {
         self.x = x;
         self.y = y;
     }
 
-    pub fn pos(&self) -> (u16, u16) {
+    pub fn pos(&self) -> (i16, i16) {
         (self.x, self.y)
     }// This is a placeholder. In a real implementation, you'd store this in the GameWorld struct.
 
@@ -70,7 +61,7 @@ pub struct Image {
 
 #[derive(Debug, Clone)]
 pub struct Polygon {
-    pub points: Vec<(u16, u16)>,
+    pub points: Vec<(i16, i16)>,
 }
 
 #[derive(Debug, Clone)]
@@ -115,7 +106,7 @@ impl GameWorld {
     // Object Creation
     // ========================
 
-    pub fn create_rect(&mut self, x: u16, y: u16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
+    pub fn create_rect(&mut self, x: i16, y: i16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
         let id = next_id();
 
         let rect = Rect {
@@ -126,7 +117,7 @@ impl GameWorld {
         id
     }
 
-    pub fn create_circle(&mut self, x: u16, y: u16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
+    pub fn create_circle(&mut self, x: i16, y: i16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
         let id = next_id();
 
         let circle = Circle {
@@ -139,8 +130,8 @@ impl GameWorld {
 
     pub fn create_image(
         &mut self,
-        x: u16,
-        y: u16,
+        x: i16,
+        y: i16,
         w: u16,
         h: u16,
         src: String,
@@ -157,7 +148,7 @@ impl GameWorld {
         id
     }
 
-    pub fn create_polygon(&mut self, points: Vec<(u16, u16)>) -> u32 {
+    pub fn create_polygon(&mut self, points: Vec<(i16, i16)>) -> u32 {
         let id = next_id();
 
         let polygon = Polygon { points };
@@ -193,25 +184,17 @@ impl GameWorld {
                 GameObject::Circle(c) => c.transform.move_by(dx, dy),
                 GameObject::Image(i) => i.transform.move_by(dx, dy),
                 GameObject::Polygon(p) => {
+                    
                     for point in &mut p.points {
-                        if dx >= 0 {
-                            point.0 += dx as u16;
-                        } else {
-                            point.0 -= (-dx) as u16;
-                        }
-
-                        if dy >= 0 {
-                            point.1 += dy as u16;
-                        } else {
-                            point.1 -= (-dy) as u16;
-                        }
+                        point.0 += dx;
+                        point.1 += dy;
                     }
                 }
             }
         }
     }
 
-    pub fn set_position(&mut self, id: u32, x: u16, y: u16) {
+    pub fn set_position(&mut self, id: u32, x: i16, y: i16) {
         if let Some(obj) = self.objects.get_mut(&id) {
             match obj {
                 GameObject::Rect(r) => r.transform.set_pos(x, y),
@@ -219,8 +202,8 @@ impl GameWorld {
                 GameObject::Image(i) => i.transform.set_pos(x, y),
                 GameObject::Polygon(p) => {
                     if let Some((cx, cy)) = p.points.first().copied() {
-                        let dx: u16 = x - cx;
-                        let dy: u16 = y - cy;
+                        let dx: i16 = x - cx;
+                        let dy: i16 = y - cy;
 
                         for point in &mut p.points {
                             point.0 += dx;
@@ -232,24 +215,22 @@ impl GameWorld {
         }
     }
 
-    pub fn get_position(&mut self, id: u32, x: u16, y: u16) {
+    pub fn get_position(&mut self, id: u32) -> (i16, i16) {
         if let Some(obj) = self.objects.get_mut(&id) {
             match obj {
-                GameObject::Rect(r) => r.transform.set_pos(x, y),
-                GameObject::Circle(c) => c.transform.set_pos(x, y),
-                GameObject::Image(i) => i.transform.set_pos(x, y),
+                GameObject::Rect(r) => r.transform.pos(),
+                GameObject::Circle(c) => c.transform.pos(),
+                GameObject::Image(i) => i.transform.pos(),
                 GameObject::Polygon(p) => {
                     if let Some((cx, cy)) = p.points.first().copied() {
-                        let dx: u16 = x - cx;
-                        let dy: u16 = y - cy;
-
-                        for point in &mut p.points {
-                            point.0 += dx;
-                            point.1 += dy;
-                        }
+                        (cx, cy)
+                    } else {
+                        (0, 0)
                     }
                 }
             }
+        } else {
+            (0, 0)
         }
     }
 
