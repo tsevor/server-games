@@ -28,17 +28,18 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     let mut world = GameWorld::new();
 
     world.set_background_color(0, 0, 255);
-    let rect_id = world.create_rect(10, 20, 50, 50, (255,0,0));
-    let circle_id = world.create_circle(100, 100, 40, 40,(0,255,0));
+    let player_id = world.create_rect(10, 20, 50, 50, (255,0,0));
+    let circle_id = world.create_rect(100, 100, 40, 40,(0,255,0));
 
-    world.move_object(rect_id, 5, 5);
+    world.move_object(player_id, 5, 5);
     world.set_position(circle_id, 200, 200);
     // let mut test2 = Circle::new(100, 50, 20, 40);
     // objects.add_object(ObjectTypes::Circle(test2));
     loop {
         let frame_start = Instant::now();
         let mut input = get_input(stream);
-        world.move_object(rect_id,  5*(input.key_d as i16 - input.key_a as i16), 5*(input.key_s as i16 - input.key_w as i16));
+        world.move_object(player_id,  5*(input.key_d as i16 - input.key_a as i16), 5*(input.key_s as i16 - input.key_w as i16));
+        world.resolve_collision(player_id, circle_id);
         send_game_state(&mut stream, &world);
         
         let mut buffer = [0; 1028];

@@ -254,19 +254,19 @@ int main(int argc, char *argv[]) {
 		case 0x06: // fill ellipses: NRGB(XXYYWWHH)
 		case 0x07: { // draw ellipses: NRGB(XXYYWWHH)
 			uint8_t header[4];
-			r = secure_recv(socket, header, 4);
-			if (r != 4) break;
+			r = secure_recv(socket, header, 1);
+			if (r != 1) break;
 			uint8_t n = header[0];
-			SDL_Color color = {header[1], header[2], header[3], 255};
 			for (int i = 0; i < n; i++) {
-				uint8_t rect_buf[8];
-				r = secure_recv(socket, rect_buf, 8);
-				if (r != 8) break;
+				uint8_t rect_buf[11];
+				r = secure_recv(socket, rect_buf, 11);
+				if (r != 11) break;
 				int x = *(int16_t*)&rect_buf[0];
 				int y = *(int16_t*)&rect_buf[2];
 				int w = *(uint16_t*)&rect_buf[4];
 				int h = *(uint16_t*)&rect_buf[6];
 				SDL_Rect rect = {x, y, w, h};
+				SDL_Color color = {rect_buf[8], rect_buf[9], rect_buf[10], 255};
 				if (packet_type == 0x04) {
 					fillRect(renderer, rect, color);
 				} else if (packet_type == 0x05) {

@@ -11,13 +11,13 @@ fn next_id() -> u32 {
 pub struct Transform {
     pub x: i16,
     pub y: i16,
-    pub width: u16,
-    pub height: u16,
+    pub width: i16,
+    pub height: i16,
     pub rgb: (u8,u8,u8),
 }
 
 impl Transform {
-    pub fn new(x: i16, y: i16, width: u16, height: u16, rgb: (u8,u8,u8)) -> Self {
+    pub fn new(x: i16, y: i16, width: i16, height: i16, rgb: (u8,u8,u8)) -> Self {
         Self { x, y, width, height, rgb }
     }
 
@@ -35,7 +35,7 @@ impl Transform {
         (self.x, self.y)
     }// This is a placeholder. In a real implementation, you'd store this in the GameWorld struct.
 
-    pub fn size(&self) -> (u16, u16) {
+    pub fn size(&self) -> (i16, i16) {
         (self.width, self.height)
     }
     pub fn color(&self) -> (u8,u8,u8){
@@ -106,7 +106,7 @@ impl GameWorld {
     // Object Creation
     // ========================
 
-    pub fn create_rect(&mut self, x: i16, y: i16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
+    pub fn create_rect(&mut self, x: i16, y: i16, w: i16, h: i16, rgb: (u8,u8,u8)) -> u32 {
         let id = next_id();
 
         let rect = Rect {
@@ -117,7 +117,7 @@ impl GameWorld {
         id
     }
 
-    pub fn create_circle(&mut self, x: i16, y: i16, w: u16, h: u16, rgb: (u8,u8,u8)) -> u32 {
+    pub fn create_circle(&mut self, x: i16, y: i16, w: i16, h: i16, rgb: (u8,u8,u8)) -> u32 {
         let id = next_id();
 
         let circle = Circle {
@@ -132,8 +132,8 @@ impl GameWorld {
         &mut self,
         x: i16,
         y: i16,
-        w: u16,
-        h: u16,
+        w: i16,
+        h: i16,
         src: String,
         rgb: (u8,u8,u8),
     ) -> u32 {
@@ -234,19 +234,43 @@ impl GameWorld {
         }
     }
 
+    pub fn get_size(&mut self, id: u32) -> (i16, i16) {
+        if let Some(obj) = self.objects.get_mut(&id) {
+            match obj {
+                GameObject::Rect(r) => r.transform.size(),
+                GameObject::Circle(c) => c.transform.size(),
+                GameObject::Image(i) => i.transform.size(),
+                GameObject::Polygon(p) => {
+                    if let Some((cx, cy)) = p.points.first().copied() {
+                        (cx, cy)
+                    } else {
+                        (0, 0)
+                    }
+                }
+            }
+        } else {
+            (0, 0)
+        }
+    }
+
     pub fn is_collided(&mut self, id: u32, id2: u32) -> bool{
-        let a = get(id);
-        let b - get(id2);
+        // let a = self.get(id);
+        // let b = self.get(id2);
+        let (ax, ay) = self.get_position(id);
+        let (aw, ah) = self.get_size(id);
 
-        let axp = a.x + a.width;
-        let axn = a.x - a.width;
-        let ayp = a.y + a.height;
-        let ayn = a.y - a.height;
+        let axp = ax + aw;
+        let axn = ax - aw;
+        let ayp = ay + ah;
+        let ayn = ay - ah;
 
-        let bxn = b.x - b.width;
-        let bxp = b.x + b.width;
-        let byn = b.y - b.height;
-        let byp = b.y + b.height;
+        let (bx, by) = self.get_position(id2);
+        let (bw, bh) = self.get_size(id2);
+
+        let bxn = bx - bw;
+        let bxp = bx + bw;
+        let byn = by - bh;
+        let byp = by + bh;
 
         // Check separation
         if axp < bxn {
@@ -264,19 +288,29 @@ impl GameWorld {
         if ayn > byp {
             return false;
         }
+        return false;
     }
-    fn resolve_collision(a: &mut Box, b: &Box) {
-        // Edges of A
-        let axp = a.x + a.width;
-        let axn = a.x - a.width;
-        let ayp = a.y + a.height;
-        let ayn = a.y - a.height;
 
+    pub fn resolve_collision(&mut self, id: u32, id2: u32) {
+        // let a = self.get(id);
+        // let b = self.get(id2);
+
+        // Edges of A
+        let (ax, ay) = self.get_position(id);
+        let (aw, ah) = self.get_size(id);
+
+        let axp = ax + aw;
+        let axn = ax - aw;
+        let ayp = ay + ah;
+        let ayn = ay - ah;
+
+        let (bx, by) = self.get_position(id2);
+        let (bw, bh) = self.get_size(id2);
         // Edges of B
-        let bxp = b.x + b.width;
-        let bxn = b.x - b.width;
-        let byp = b.y + b.height;
-        let byn = b.y - b.height;
+        let bxp = bx + bw;
+        let bxn = bx - bw;
+        let byp = by + bh;
+        let byn = by - bh;
 
         // Check if colliding
         if axp < bxn || axn > bxp || ayp < byn || ayn > byp {
@@ -284,13 +318,13 @@ impl GameWorld {
         }
 
         // Compute overlap on each axis
-        let overlap_x = if a.x < b.x {
+        let overlap_x = if ax < bx {
             axp - bxn
         } else {
             bxp - axn
         };
 
-        let overlap_y = if a.y < b.y {
+        let overlap_y = if ay < by {
             ayp - byn
         } else {
             byp - ayn
@@ -299,18 +333,18 @@ impl GameWorld {
         // Resolve along smallest axis
         if overlap_x < overlap_y {
             // Resolve X
-            if a.x < b.x {
-                move_object(a,-overlap_x,0);
+            if ax < bx {
+                self.move_object(id,-overlap_x,0);
             } else {
-                move_object(a,overlap_x,0);
+                self.move_object(id,overlap_x,0);
                 
             }
         } else {
             // Resolve Y
-            if a.y < b.y {
-                move_object(a,-overlap_y,0);
+            if ay < by {
+                self.move_object(id,-overlap_y,0);
             } else {
-                move_object(a,overlap_y,0);
+                self.move_object(id,overlap_y,0);
                 
             }
         }

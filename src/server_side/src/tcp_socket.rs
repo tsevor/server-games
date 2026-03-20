@@ -83,11 +83,6 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
                 rect_count += 1;
                 // set color to blue
                 
-                let (r, g, b) = rect.transform.color();
-                rect_vec.push(r);
-                rect_vec.push(g);
-                rect_vec.push(b);
-                
                 let (x, y) = rect.transform.pos(); // (x, y)
                 let (width, height) = rect.transform.size(); // (width, height)
                 rect_vec.push((x & 0xff) as u8);
@@ -98,15 +93,15 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
                 rect_vec.push((width >> 8) as u8);
                 rect_vec.push((height & 0xff) as u8);
                 rect_vec.push((height >> 8) as u8);
+
+                let (r, g, b) = rect.transform.color();
+                rect_vec.push(r);
+                rect_vec.push(g);
+                rect_vec.push(b);
             }
 
             GameObject::Circle(circle) => {
                 circle_count += 1;
-
-                let (r, g, b) = circle.transform.color();
-                circle_vec.push(r); // Add color :/
-                circle_vec.push(g);
-                circle_vec.push(b);
 
                 let (x, y) = circle.transform.pos(); // (x, y)
                 let (width, height) = circle.transform.size(); // (width, height)
@@ -118,6 +113,10 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
                 circle_vec.push((width >> 8) as u8);
                 circle_vec.push((height & 0xff) as u8);
                 circle_vec.push((height >> 8) as u8);
+                let (r, g, b) = circle.transform.color();
+                circle_vec.push(r); // Add color :/
+                circle_vec.push(g);
+                circle_vec.push(b);
             }
 
             GameObject::Image(image) => {
@@ -184,7 +183,7 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
     for n in data {
         bytes.write_u8(n)? // network byte order
     }
-    // println!("Sending bytes: {:?}",bytes);
+    println!("Sending bytes: {:?}",bytes);
 	stream.write_all(&bytes)?;
     Ok(())
 }
@@ -205,7 +204,7 @@ pub fn get_input(stream: &mut TcpStream) -> Keys {
 
     // --- 3. Validate it's a keyboard state packet (0x03) ---
     if packet_id != 0x03 {
-        eprintln!("Expected keyboard state packet (0x03), got ({:#04x})", packet_id);
+        // eprintln!("Expected keyboard state packet (0x03), got ({:#04x})", packet_id);
         return input;
     }
 
