@@ -232,25 +232,22 @@ impl GameWorld {
         }
     }
 
-    pub fn get_position(&mut self, id: u32, x: u16, y: u16) {
+    pub fn get_position(&mut self, id: u32) -> (u16, u16) {
         if let Some(obj) = self.objects.get_mut(&id) {
             match obj {
-                GameObject::Rect(r) => r.transform.set_pos(x, y),
-                GameObject::Circle(c) => c.transform.set_pos(x, y),
-                GameObject::Image(i) => i.transform.set_pos(x, y),
+                GameObject::Rect(r) => r.transform.pos(),
+                GameObject::Circle(c) => c.transform.pos(),
+                GameObject::Image(i) => i.transform.pos(),
                 GameObject::Polygon(p) => {
                     if let Some((cx, cy)) = p.points.first().copied() {
-                        let dx: u16 = x - cx;
-                        let dy: u16 = y - cy;
-
-                        for point in &mut p.points {
-                            point.0 += dx;
-                            point.1 += dy;
-                        }
+                        (cx, cy)
+                    } else {
+                        (0, 0)
                     }
                 }
             }
+        } else {
+            (0, 0)
         }
     }
-
 }
