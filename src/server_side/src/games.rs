@@ -30,7 +30,6 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
     world.set_position(circle_id, 200, 200);
     // let mut test2 = Circle::new(100, 50, 20, 40);
     // objects.add_object(ObjectTypes::Circle(test2));
-    
     loop {
         world.move_object(rect_id, 1, 0);
         let mut input = get_input(stream);

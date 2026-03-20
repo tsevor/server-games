@@ -21,9 +21,18 @@ impl Transform {
         Self { x, y, width, height, rgb }
     }
 
-    pub fn move_by(&mut self, dx: u16, dy: u16) {
-        self.x += dx;
-        self.y += dy;
+    pub fn move_by(&mut self, dx: i16, dy: i16) {
+        if dx >= 0 {
+            self.x += dx as u16;
+        } else {
+            self.x -= (-dx) as u16;
+        }
+
+        if dy >= 0 {
+            self.y += dy as u16;
+        } else {
+            self.y -= (-dy) as u16;
+        }
     }
 
     pub fn set_pos(&mut self, x: u16, y: u16) {
@@ -177,7 +186,7 @@ impl GameWorld {
     // Transform Manipulation
     // ========================
 
-    pub fn move_object(&mut self, id: u32, dx: u16, dy: u16) {
+    pub fn move_object(&mut self, id: u32, dx: i16, dy: i16) {
         if let Some(obj) = self.objects.get_mut(&id) {
             match obj {
                 GameObject::Rect(r) => r.transform.move_by(dx, dy),
@@ -185,8 +194,17 @@ impl GameWorld {
                 GameObject::Image(i) => i.transform.move_by(dx, dy),
                 GameObject::Polygon(p) => {
                     for point in &mut p.points {
-                        point.0 += dx;
-                        point.1 += dy;
+                        if dx >= 0 {
+                            point.0 += dx as u16;
+                        } else {
+                            point.0 -= (-dx) as u16;
+                        }
+
+                        if dy >= 0 {
+                            point.1 += dy as u16;
+                        } else {
+                            point.1 -= (-dy) as u16;
+                        }
                     }
                 }
             }
@@ -201,8 +219,8 @@ impl GameWorld {
                 GameObject::Image(i) => i.transform.set_pos(x, y),
                 GameObject::Polygon(p) => {
                     if let Some((cx, cy)) = p.points.first().copied() {
-                        let dx = x - cx;
-                        let dy = y - cy;
+                        let dx: u16 = x - cx;
+                        let dy: u16 = y - cy;
 
                         for point in &mut p.points {
                             point.0 += dx;
@@ -213,4 +231,26 @@ impl GameWorld {
             }
         }
     }
+
+    pub fn get_position(&mut self, id: u32, x: u16, y: u16) {
+        if let Some(obj) = self.objects.get_mut(&id) {
+            match obj {
+                GameObject::Rect(r) => r.transform.set_pos(x, y),
+                GameObject::Circle(c) => c.transform.set_pos(x, y),
+                GameObject::Image(i) => i.transform.set_pos(x, y),
+                GameObject::Polygon(p) => {
+                    if let Some((cx, cy)) = p.points.first().copied() {
+                        let dx: u16 = x - cx;
+                        let dy: u16 = y - cy;
+
+                        for point in &mut p.points {
+                            point.0 += dx;
+                            point.1 += dy;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
