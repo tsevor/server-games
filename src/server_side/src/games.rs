@@ -34,11 +34,8 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     let mut v: i16 = 1;
     loop {
         
-        world.move_object(rect_id, v, 0);
-        if world.get_position(rect_id).0 > 500 { v = -1; }
-        if world.get_position(rect_id).0 < 10 { v = 1; }
         let mut input = get_input(stream);
-        world.move_object(rect_id,  input.key_d as i8 - input.key_a as i8, input.key_w as i8 - input.key_s as i8);
+        world.move_object(rect_id,  5*(input.key_d as i16 - input.key_a as i16), 5*(input.key_s as i16 - input.key_w as i16));
         send_game_state(&mut stream, &world);
         
         let mut buffer = [0; 1028];
