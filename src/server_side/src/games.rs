@@ -17,7 +17,7 @@ use crate::tcp_socket::send_game_state;
 
 
 pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
-    let _input = Arc::new(Mutex::new(Keys::default()));
+   
     //to use it in other areas inport it and use method arc::clone(&input) to clone it and use it in other areas
     //and assign that to a variable
     let mut world = GameWorld::new();
@@ -31,7 +31,9 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
     let mut rect_direction: i16 = 1;
     loop {
         world.move_object(rect_id, rect_direction, 0);
+        let mut input = get_input(stream);
         send_game_state(&mut stream, &world);
+        
         let mut buffer = [0; 1028];
         let bytes_read = stream.read(&mut buffer)?;
         if let Some(obj) = world.get(id) {
@@ -58,7 +60,7 @@ pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
 
         // println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read]);
         std::thread::sleep(std::time::Duration::from_millis(10));
-    
+        
     }
 }
 

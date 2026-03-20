@@ -1,6 +1,7 @@
 use std::net::{TcpListener, TcpStream};
 use std::io::{Read,Write};
 use std::str;
+use crate::input::*;
 use crate::games::game;
 use std::thread;
 use crate::game_lib::*;
@@ -173,6 +174,76 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
 	stream.write_all(&bytes)?;
     Ok(())
 }
+pub fn send_game_data(){
+    objects = copy::games::objects();
+}
+
+pub fn get_input(stream: &mut TcpStream) -> keys {
+    // --- 1. Request keyboard state from client ---
+    stream.write_all(&[0x80]).expect("Failed to send kb request");
+
+    // --- 2. Read response packet header ---
+    let mut header = [0u8; 2];
+    stream.read_exact(&mut header).expect("Failed to read packet header");
+
+    let packet_id = header[0];
+    let key_count  = header[1]; // N = number of keys currently pressed
+
+    let mut input = keys::default();
+
+    // --- 3. Validate it's a keyboard state packet (0x03) ---
+    if packet_id != 0x03 {
+        eprintln!("Expected keyboard state packet (0x03), got ({:#04x})", packet_id);
+        return input;
+    }
+
+    // --- 4. Read N key bytes ---
+    let mut key_bytes = vec![0u8; key_count as usize];
+    stream.read_exact(&mut key_bytes).expect("Failed to read key bytes");
+
+    // --- 5. Match ASCII key codes to struct fields ---
+    for k in key_bytes {
+        match k {
+            b'a' => input.a = true,
+            b'b' => input.b = true,
+            b'c' => input.c = true,
+            b'd' => input.d = true,
+            b'e' => input.e = true,
+            b'f' => input.f = true,
+            b'g' => input.g = true,
+            b'h' => input.h = true,
+            b'i' => input.i = true,
+            b'j' => input.j = true,
+            b'k' => input.k = true,
+            b'l' => input.l = true,
+            b'm' => input.m = true,
+            b'n' => input.n = true,
+            b'o' => input.o = true,
+            b'p' => input.p = true,
+            b'q' => input.q = true,
+            b'r' => input.r = true,
+            b's' => input.s = true,
+            b't' => input.t = true,
+            b'u' => input.u = true,
+            b'v' => input.v = true,
+            b'w' => input.w = true,
+            b'x' => input.x = true,
+            b'y' => input.y = true,
+            b'z' => input.z = true,
+
+            b' '  => input.space     = true,
+            b'\n' => input.enter     = true,
+            b'\x08' => input.backspace = true,
+            b'\x1b' => input.esc      = true,
+
+            _ => {} // unknown/unhandled key
+        }
+    }
+
+    input
+}
+
+
 /*
 Packet structure:
 
