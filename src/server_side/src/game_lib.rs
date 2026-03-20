@@ -253,4 +253,87 @@ impl GameWorld {
         }
     }
 
+    pub fn is_collided(&mut self, id: u32, id2: u32) -> bool{
+        let a = get(id);
+        let b - get(id2);
+
+        let axp = a.x + a.width;
+        let axn = a.x - a.width;
+        let ayp = a.y + a.height;
+        let ayn = a.y - a.height;
+
+        let bxn = b.x - b.width;
+        let bxp = b.x + b.width;
+        let byn = b.y - b.height;
+        let byp = b.y + b.height;
+
+        // Check separation
+        if axp < bxn {
+            return false;
+        }
+
+        if axn > bxp {
+            return false;
+        }
+
+        if ayp < byn {
+            return false;
+        }
+
+        if ayn > byp {
+            return false;
+        }
+    }
+    fn resolve_collision(a: &mut Box, b: &Box) {
+        // Edges of A
+        let axp = a.x + a.width;
+        let axn = a.x - a.width;
+        let ayp = a.y + a.height;
+        let ayn = a.y - a.height;
+
+        // Edges of B
+        let bxp = b.x + b.width;
+        let bxn = b.x - b.width;
+        let byp = b.y + b.height;
+        let byn = b.y - b.height;
+
+        // Check if colliding
+        if axp < bxn || axn > bxp || ayp < byn || ayn > byp {
+            return; // no collision
+        }
+
+        // Compute overlap on each axis
+        let overlap_x = if a.x < b.x {
+            axp - bxn
+        } else {
+            bxp - axn
+        };
+
+        let overlap_y = if a.y < b.y {
+            ayp - byn
+        } else {
+            byp - ayn
+        };
+
+        // Resolve along smallest axis
+        if overlap_x < overlap_y {
+            // Resolve X
+            if a.x < b.x {
+                move_object(a,-overlap_x,0);
+            } else {
+                move_object(a,overlap_x,0);
+                
+            }
+        } else {
+            // Resolve Y
+            if a.y < b.y {
+                move_object(a,-overlap_y,0);
+            } else {
+                move_object(a,overlap_y,0);
+                
+            }
+        }
+    }
+    
+
 }
