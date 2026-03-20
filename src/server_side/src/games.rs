@@ -5,6 +5,10 @@ use crate::game_lib::*;
 use crate::input::Keys;
 use crate::tcp_socket::send_game_state;
 use crate::tcp_socket::get_input;
+use std::time::Instant;
+use std::thread::sleep;
+use std::time::Duration;
+
 
 /*fn loadGame(
 
@@ -31,9 +35,8 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     world.set_position(circle_id, 200, 200);
     // let mut test2 = Circle::new(100, 50, 20, 40);
     // objects.add_object(ObjectTypes::Circle(test2));
-    let mut v: i16 = 1;
     loop {
-        
+        let frame_start = Instant::now();
         let mut input = get_input(stream);
         world.move_object(rect_id,  5*(input.key_d as i16 - input.key_a as i16), 5*(input.key_s as i16 - input.key_w as i16));
         send_game_state(&mut stream, &world);
@@ -57,7 +60,10 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
 
 
         // println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read]);
-        std::thread::sleep(std::time::Duration::from_millis(10));
+        
+        let duration = frame_start.elapsed();
+        let remaining = Duration::from_millis(10).saturating_sub(duration);
+        std::thread::sleep(remaining);
         
     }
 }
