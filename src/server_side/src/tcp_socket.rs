@@ -36,7 +36,7 @@ fn accept_client(mut stream: TcpStream) -> std::io::Result<()> {
         return Ok(());
     }
 
-    game(stream);
+    game(&mut stream);
     return Ok(());
 }
 
@@ -188,11 +188,9 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
 	stream.write_all(&bytes)?;
     Ok(())
 }
-pub fn send_game_data(){
-    objects = copy::games::objects();
-}
 
-pub fn get_input(stream: &mut TcpStream) -> keys {
+
+pub fn get_input(stream: &mut TcpStream) -> Keys {
     // --- 1. Request keyboard state from client ---
     stream.write_all(&[0x80]).expect("Failed to send kb request");
 
@@ -203,7 +201,7 @@ pub fn get_input(stream: &mut TcpStream) -> keys {
     let packet_id = header[0];
     let key_count  = header[1]; // N = number of keys currently pressed
 
-    let mut input = keys::default();
+    let mut input = Keys::default();
 
     // --- 3. Validate it's a keyboard state packet (0x03) ---
     if packet_id != 0x03 {
@@ -218,37 +216,37 @@ pub fn get_input(stream: &mut TcpStream) -> keys {
     // --- 5. Match ASCII key codes to struct fields ---
     for k in key_bytes {
         match k {
-            b'a' => input.a = true,
-            b'b' => input.b = true,
-            b'c' => input.c = true,
-            b'd' => input.d = true,
-            b'e' => input.e = true,
-            b'f' => input.f = true,
-            b'g' => input.g = true,
-            b'h' => input.h = true,
-            b'i' => input.i = true,
-            b'j' => input.j = true,
-            b'k' => input.k = true,
-            b'l' => input.l = true,
-            b'm' => input.m = true,
-            b'n' => input.n = true,
-            b'o' => input.o = true,
-            b'p' => input.p = true,
-            b'q' => input.q = true,
-            b'r' => input.r = true,
-            b's' => input.s = true,
-            b't' => input.t = true,
-            b'u' => input.u = true,
-            b'v' => input.v = true,
-            b'w' => input.w = true,
-            b'x' => input.x = true,
-            b'y' => input.y = true,
-            b'z' => input.z = true,
+            b'a' => input.key_a = true,
+            b'b' => input.key_b = true,
+            b'c' => input.key_c = true,
+            b'd' => input.key_d = true,
+            b'e' => input.key_e = true,
+            b'f' => input.key_f = true,
+            b'g' => input.key_g = true,
+            b'h' => input.key_h = true,
+            b'i' => input.key_i = true,
+            b'j' => input.key_j = true,
+            b'k' => input.key_k = true,
+            b'l' => input.key_l = true,
+            b'm' => input.key_m = true,
+            b'n' => input.key_n = true,
+            b'o' => input.key_o = true,
+            b'p' => input.key_p = true,
+            b'q' => input.key_q = true,
+            b'r' => input.key_r = true,
+            b's' => input.key_s = true,
+            b't' => input.key_t = true,
+            b'u' => input.key_u = true,
+            b'v' => input.key_v = true,
+            b'w' => input.key_w = true,
+            b'x' => input.key_x = true,
+            b'y' => input.key_y = true,
+            b'z' => input.key_z = true,
 
-            b' '  => input.space     = true,
-            b'\n' => input.enter     = true,
-            b'\x08' => input.backspace = true,
-            b'\x1b' => input.esc      = true,
+            b' '  => input.key_space     = true,
+            b'\n' => input.key_enter     = true,
+            // b'\x08' => input.key_backspace = true,
+            // b'\x1b' => input.key_esc      = true,
 
             _ => {} // unknown/unhandled key
         }

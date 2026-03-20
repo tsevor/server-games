@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex};
 use crate::game_lib::*;
 use crate::input::Keys;
 use crate::tcp_socket::send_game_state;
+use crate::tcp_socket::get_input;
 
 /*fn loadGame(
 
@@ -16,7 +17,7 @@ use crate::tcp_socket::send_game_state;
 
 
 
-pub fn game(mut stream: TcpStream) -> Result<(), Box<dyn std::error::Error>> {
+pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>> {
    
     //to use it in other areas inport it and use method arc::clone(&input) to clone it and use it in other areas
     //and assign that to a variable
