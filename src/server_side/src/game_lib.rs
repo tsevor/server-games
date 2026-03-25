@@ -22,8 +22,8 @@ impl Transform {
     }
 
     pub fn move_by(&mut self, dx: i16, dy: i16) {
-        self.x += dx;
-        self.y += dy;
+        self.x = self.x.saturating_add(dx);
+        self.y = self.y.saturating_add(dy);
     }
 
     pub fn set_pos(&mut self, x: i16, y: i16) {
@@ -253,23 +253,23 @@ impl GameWorld {
         }
     }
 
-    pub fn is_collided(&mut self, id: u32, id2: u32) -> bool{
+    pub fn is_collided(&mut self, id: u32, id2: u32) -> bool {
         // let a = self.get(id);
         // let b = self.get(id2);
         let (ax, ay) = self.get_position(id);
         let (aw, ah) = self.get_size(id);
 
         let axp = ax + aw;
-        let axn = ax - aw;
+        let axn = ax;
         let ayp = ay + ah;
         let ayn = ay - ah;
 
         let (bx, by) = self.get_position(id2);
         let (bw, bh) = self.get_size(id2);
 
-        let bxn = bx - bw;
+        let bxn = bx;
         let bxp = bx + bw;
-        let byn = by - bh;
+        let byn = by;
         let byp = by + bh;
 
         // Check separation
@@ -291,7 +291,7 @@ impl GameWorld {
         return false;
     }
 
-    pub fn resolve_collision(&mut self, id: u32, id2: u32) {
+    pub fn resolve_collision(&mut self, id: u32, id2: u32) -> bool {
         // let a = self.get(id);
         // let b = self.get(id2);
 
@@ -314,7 +314,7 @@ impl GameWorld {
 
         // Check if colliding
         if axp < bxn || axn > bxp || ayp < byn || ayn > byp {
-            return; // no collision
+            return false; // no collision
         }
 
         // Compute overlap on each axis
@@ -349,7 +349,10 @@ impl GameWorld {
                 
             }
         }
+    return true;
     }
-    
 
+}
+pub fn f32toi16(float:f32) ->i16{
+    float.round() as i16   
 }
