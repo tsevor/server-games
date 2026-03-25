@@ -183,7 +183,7 @@ pub fn send_game_state(stream: &mut TcpStream, world: &GameWorld) -> Result<(), 
     for n in data {
         bytes.write_u8(n)? // network byte order
     }
-    println!("Sending bytes: {:?}",bytes);
+    // println!("Sending bytes: {:?}",bytes);
 	stream.write_all(&bytes)?;
     Ok(())
 }

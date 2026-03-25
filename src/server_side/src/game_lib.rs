@@ -300,17 +300,17 @@ impl GameWorld {
         let (aw, ah) = self.get_size(id);
 
         let axp = ax + aw;
-        let axn = ax - aw;
+        let axn = ax; // - aw;
         let ayp = ay + ah;
-        let ayn = ay - ah;
+        let ayn = ay; //- ah;
 
         let (bx, by) = self.get_position(id2);
         let (bw, bh) = self.get_size(id2);
         // Edges of B
         let bxp = bx + bw;
-        let bxn = bx - bw;
+        let bxn = bx; //- bw;
         let byp = by + bh;
-        let byn = by - bh;
+        let byn = by; //- bh;
 
         // Check if colliding
         if axp < bxn || axn > bxp || ayp < byn || ayn > byp {
@@ -331,6 +331,7 @@ impl GameWorld {
         };
 
         // Resolve along smallest axis
+        // println!("X overlap: {} Y overlap: {}", overlap_x, overlap_y);
         if overlap_x < overlap_y {
             // Resolve X
             if ax < bx {
@@ -342,9 +343,9 @@ impl GameWorld {
         } else {
             // Resolve Y
             if ay < by {
-                self.move_object(id,-overlap_y,0);
+                self.move_object(id,0,-overlap_y);
             } else {
-                self.move_object(id,overlap_y,0);
+                self.move_object(id,0,overlap_y);
                 
             }
         }
