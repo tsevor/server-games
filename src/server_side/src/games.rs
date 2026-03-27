@@ -1,5 +1,5 @@
 use std::net::TcpStream;
-// use std::io::{Read};
+use std::io::{Read};
 // use std::sync::{Arc, Mutex};
 use crate::game_lib::*;
 use crate::input::Keys;
@@ -37,9 +37,9 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     level1.push(world.create_rect(750,300,15,1000,(30,255,30)));
     level1.push(world.create_rect(0,300,15,1000,(30,255,30)));
     level1.push(world.create_rect(300,0,730,50,(30,255,30)));
-    level1.push(world.create_rect());
-    let level1_start: Vec<i16> = [100,400];
-    let level1_end: Vec<i16> = [600,100];
+    // level1.push(world.create_rect());
+    let level1_start: (i16, i16) = (100,400);
+    let level1_end: (i16, i16) = (600,100);
     let mut platform_ids: Vec<u32> = Vec::new();
     //platform_ids.push(world.create_rect(300,500,720,10,(50,50,255)));
 
@@ -52,7 +52,7 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     // objects.add_object(ObjectTypes::Circle(test2));
 
     //can we m
-    loadlevel(&mut world,&mut platform ids,level1,level1_start,level1_end);
+    loadlevel(&mut world, player_id, win_rect_id, &mut platform_ids, level1, level1_start, level1_end);
     loop {
         
         let frame_start = Instant::now();
@@ -123,11 +123,11 @@ fn resolve_platforms_collision(mut world: &mut GameWorld, operation: u32, ids: &
     collided
 }
 //load level
-fn loadlevel(mut world: &mut GameWorld,mut platform_ids: &mut Vec<u32>, platforms: Vec<u32>, start: Vec<i16>, end: Vec<i16){
+fn loadlevel(mut world: &mut GameWorld, player_id: u32, win_rect_id: u32, mut platform_ids: &mut Vec<u32>, mut platforms: Vec<u32>, start: (i16, i16), end: (i16, i16)){
     platform_ids.clear();
-    platform_ids.append(platforms);
-    world.set_pos(player_id,start.at(0),start.at(1));
-    world.set_pos(win_rect_id,end.at(0,end.at(1)));
+    platform_ids.append(&mut platforms);
+    world.set_position(player_id,start.0,start.1);
+    world.set_position(win_rect_id,end.0,end.1);
 
 }
 
