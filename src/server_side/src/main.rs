@@ -39,7 +39,7 @@ fn main() {
         //keyboard input
         if event::poll(std::time::Duration::from_millis(10)).expect("POLL ERROR") {
             match event::read(){
-                Ok (event)=>{
+                Ok (_event)=>{
                     if let Event::Key(key) = event::read().unwrap() {
                         match key.code {
                             KeyCode::Char('q') => {
@@ -78,7 +78,7 @@ fn terminal_ui(){
     print!("\x1b[2J");
     print!("\x1b[48;5;67m");
     print!("\x1b[H");
-    for n in 1..100{
+    for _n in 1..100{
         
         print!("\x1b[48;5;238m");
         print!("\x1b[K");

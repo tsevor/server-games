@@ -288,7 +288,7 @@ impl GameWorld {
         if ayn > byp {
             return false;
         }
-        return false;
+        return true;
     }
 
     pub fn resolve_collision(&mut self, id: u32, id2: u32) -> bool {
@@ -349,7 +349,7 @@ impl GameWorld {
                 
             }
         }
-    return true;
+        return true;
     }
 
 }
