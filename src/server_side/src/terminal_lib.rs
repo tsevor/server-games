@@ -23,11 +23,11 @@ pub fn add_window(x: i8, y: i8, message: &str) {
     // top border
     move_to(x, y);
     print!("\x1b[48;5;238m");
-    
+
 
     // message lines
     print!("\x1b[48;5;67m");
-        
+
     print!("{}", " ".repeat(width+1));
     for (i, line) in lines.iter().enumerate() {
 
@@ -35,13 +35,13 @@ pub fn add_window(x: i8, y: i8, message: &str) {
 
         let padding = width - line.len();
 
-        
-        
+
+
         print!(" {}{}█", line, " ".repeat(padding));
         move_to(x, y + 2 + i as i8);
-        
-        
-        
+
+
+
     }
     move_to(x, y + 1 + lines.len() as i8);
     print!(" {}█", " ".repeat(width));
@@ -59,9 +59,9 @@ pub fn add_window(x: i8, y: i8, message: &str) {
         .push(format!("window({}, {}) -> {}", x, y, message));
 }
 
-pub
 
-fn text(x: i8, y: i8, message: &str) {
+
+pub fn text(x: i8, y: i8, message: &str) {
     move_to(x, y);
     print!("{}", message);
     io::stdout().flush().unwrap();
@@ -72,13 +72,13 @@ fn text(x: i8, y: i8, message: &str) {
         .push(format!("text({}, {}) -> {}", x, y, message));
 }
 
-fn debug_messages() {
+pub fn debug_messages() {
     let mut y = 30;
 
     let log = DEBUG.lock().unwrap();
 
     for msg in log.iter() {
-        move_to(2, y);
+        move_to(100, y);
         print!("{}", msg);
         y += 1;
     }
