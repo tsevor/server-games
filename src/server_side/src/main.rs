@@ -32,7 +32,7 @@ fn main() {
         let _ = start_listening(&args[1],&args[2]);
     });
     while  !quit {
-        
+
         print!("\x1b[48;5;67m");
         std::io::stdout().flush().unwrap();
 
@@ -54,7 +54,7 @@ fn main() {
                 eprint!("failed to read event: {}", e);
                 }
             }
-            
+
         }
     }
     std::io::stdout().flush().unwrap();
@@ -62,15 +62,15 @@ fn main() {
     print!("\x1b[?25h");
     print!("\x1b[0m");
     print!("\x1b[1000E");
-    
-    
+
+
     disable_raw_mode().unwrap();
     //connection stuff getting mew clien=mts ect
     //assigm mew thread to cliemt with the ip an
 }
 
 //server thread code
-//fn thread 
+//fn thread
 
 fn terminal_ui(){
     enable_raw_mode().unwrap();
@@ -79,11 +79,11 @@ fn terminal_ui(){
     print!("\x1b[48;5;67m");
     print!("\x1b[H");
     for _n in 1..100{
-        
+
         print!("\x1b[48;5;238m");
         print!("\x1b[K");
         print!("\x1b[1E");
-        
+
     }
     print!("\x1b[48;5;67m");
     print!("\x1b[H");
@@ -112,7 +112,6 @@ fn terminal_ui(){
     print!(" ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀");
     print!("\x1b[48;5;67m");
     print!("\x1b[48;5;62m");
-    terminal_lib::add_window(30,30,"testing");
-    
+
     std::io::stdout().flush().unwrap();
 }
