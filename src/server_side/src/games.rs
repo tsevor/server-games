@@ -23,7 +23,7 @@ pub fn win() {
 }
 
 pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>> {
-   
+
     //to use it in other areas inport it and use method arc::clone(&input) to clone it and use it in other areas
     //and assign that to a variable
     let mut world = GameWorld::new();
@@ -43,7 +43,7 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     platform_ids.push(world.create_rect(300,500,720,10,(50,50,255)));
 
 
-    
+
     let win_rect_id = world.create_rect(500, 400, 40, 40,(255,255,0));
 
     let mut player_yvel:f32 = 0_f32;
@@ -53,23 +53,24 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
     //can we m
     loadlevel(&mut world, player_id, win_rect_id, &mut platform_ids, level1, level1_start, level1_end);
     loop {
-        
+
         let frame_start = Instant::now();
         let input = get_input(stream);
         //collision stuff
         world.move_object(player_id,  5*(input.key_d as i16 - input.key_a as i16),f32toi16(player_yvel));
         //jump
-        
+
         //change to load a different level pls??
         if world.is_collided(player_id, win_rect_id) {
             win();
         }
         let player_touching = resolve_platforms_collision(&mut world, player_id, &platform_ids);
         if player_touching{
-            player_yvel = 0_f32;
-            if input.key_w {
+
+            if input.key_w && yet player_yvel == 0_f32{
                 player_yvel -= 10_f32;
             }
+            player_yvel = 0_f32;
         }else{
             let (_player_x, player_y) = world.get_position(player_id);
             terminal_lib::add_window(10, 30, &player_y.to_string());
@@ -77,11 +78,11 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
             player_yvel +=0.2_f32;
         }
         send_game_state(&mut stream, &world);
-        
+
         let mut buffer = [0; 1028];
         let bytes_read = stream.read(&mut buffer)?;
-        
-        
+
+
         if bytes_read == 0 {
             // Connection closed by the peer
             println!("Connection closed");
@@ -97,11 +98,11 @@ pub fn game(mut stream: &mut TcpStream) -> Result<(), Box<dyn std::error::Error>
 
 
         // println!("Read {} bytes: {:?}", bytes_read, &buffer[..bytes_read]);
-        
+
         let duration = frame_start.elapsed();
         let remaining = Duration::from_millis(10).saturating_sub(duration); // Fixed frame rate at 100 frames
         std::thread::sleep(remaining);
-        
+
     }
 }
 //loop over platform ids and return if collided
@@ -118,7 +119,7 @@ fn resolve_platforms_collision(world: &mut GameWorld, operation: u32, ids: &Vec<
     let mut collided = false;
     for plat in ids {
         terminal_lib::add_window(50, 30, &plat.to_string());
-        if world.resolve_collision(operation, *plat) { collided = true; } 
+        if world.resolve_collision(operation, *plat) { collided = true; }
     }
     collided
 }
@@ -130,6 +131,3 @@ fn loadlevel(world: &mut GameWorld, player_id: u32, win_rect_id: u32, platform_i
     world.set_position(win_rect_id,end.0,end.1);
 
 }
-
-
-

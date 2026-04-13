@@ -184,7 +184,7 @@ impl GameWorld {
                 GameObject::Circle(c) => c.transform.move_by(dx, dy),
                 GameObject::Image(i) => i.transform.move_by(dx, dy),
                 GameObject::Polygon(p) => {
-                    
+
                     for point in &mut p.points {
                         point.0 += dx;
                         point.1 += dy;
@@ -299,18 +299,20 @@ impl GameWorld {
         let (ax, ay) = self.get_position(id);
         let (aw, ah) = self.get_size(id);
 
-        let axp = ax + aw;
-        let axn = ax; // - aw;
-        let ayp = ay + ah;
-        let ayn = ay; //- ah;
+        let overcompensate = 2;
+
+        let axp = ax + aw + overcompensate;
+        let axn = ax + overcompensate; // - aw;
+        let ayp = ay + ah + overcompensate;
+        let ayn = ay + overcompensate; //- ah;
 
         let (bx, by) = self.get_position(id2);
         let (bw, bh) = self.get_size(id2);
         // Edges of B
-        let bxp = bx + bw;
-        let bxn = bx; //- bw;
-        let byp = by + bh;
-        let byn = by; //- bh;
+        let bxp = bx + bw + overcompensate;
+        let bxn = bx + overcompensate; //- bw;
+        let byp = by + bh + overcompensate;
+        let byn = by + overcompensate; //- bh;
 
         // Check if colliding
         if axp < bxn || axn > bxp || ayp < byn || ayn > byp {
@@ -338,7 +340,7 @@ impl GameWorld {
                 self.move_object(id,-overlap_x,0);
             } else {
                 self.move_object(id,overlap_x,0);
-                
+
             }
         } else {
             // Resolve Y
@@ -346,7 +348,7 @@ impl GameWorld {
                 self.move_object(id,0,-overlap_y);
             } else {
                 self.move_object(id,0,overlap_y);
-                
+
             }
         }
         return true;
@@ -354,5 +356,5 @@ impl GameWorld {
 
 }
 pub fn f32toi16(float:f32) ->i16{
-    float.round() as i16   
+    float.round() as i16
 }
